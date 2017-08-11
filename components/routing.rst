@@ -206,6 +206,9 @@ to find a route that fits the given request you can also build a URL from
 a certain route::
 
     use Symfony\Component\Routing\Generator\UrlGenerator;
+    use Symfony\Component\Routing\RequestContext;
+    use Symfony\Component\Routing\Route;
+    use Symfony\Component\Routing\RouteCollection;
 
     $routes = new RouteCollection();
     $routes->add('show_post', new Route('/show/{slug}'));
@@ -321,7 +324,7 @@ a path to the main route definition and some other settings::
         $resource,
         array $options = array(),
         RequestContext $context = null,
-        array $defaults = array()
+        LoggerInterface $logger = null
     );
 
 With the ``cache_dir`` option you can enable route caching (if you provide a
@@ -365,14 +368,12 @@ routes with UTF-8 characters:
         namespace AppBundle\Controller;
 
         use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-        use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+        use Symfony\Component\Routing\Annotation\Route;
 
         class DefaultController extends Controller
         {
             /**
-             *
              * @Route("/category/{name}", name="route1", options={"utf8": true})
-             *
              */
             public function categoryAction()
             {
@@ -441,20 +442,18 @@ You can also include UTF-8 strings as routing requirements:
         namespace AppBundle\Controller;
 
         use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-        use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+        use Symfony\Component\Routing\Annotation\Route;
 
         class DefaultController extends Controller
         {
             /**
-                *
-                * @Route(
-                *     "/category/{name}",
-                *     name="route2",
-                *     requirements={"default"="한국어"},
-                *     options={"utf8": true}
-                * )
-                *
-                */
+             * @Route(
+             *     "/category/{name}",
+             *     name="route2",
+             *     requirements={"default"="한국어"},
+             *     options={"utf8": true}
+             * )
+             */
             public function defaultAction()
             {
                 // ...
@@ -509,7 +508,7 @@ You can also include UTF-8 strings as routing requirements:
         // ...
 
         return $collection;
-    
+
 .. tip::
 
     In addition to UTF-8 characters, the Routing component also supports all

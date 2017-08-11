@@ -152,6 +152,7 @@ Listener Class Name                                                             
 :class:`Symfony\\Component\\HttpKernel\\EventListener\\EsiListener`                  0
 :class:`Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener`             0
 :class:`Symfony\\Component\\Security\\Http\\RememberMe\\ResponseListener`            0
+:class:`Symfony\\Bundle\\FrameworkBundle\\DataCollector\\RequestDataCollector`       0
 :class:`Symfony\\Component\\HttpKernel\\EventListener\\ProfilerListener`             -100
 :class:`Symfony\\Bundle\\FrameworkBundle\\EventListener\\TestSessionListener`        -128
 :class:`Symfony\\Bundle\\WebProfilerBundle\\EventListener\\WebDebugToolbarListener`  -128
@@ -241,19 +242,8 @@ and set a new ``Exception`` object, or do nothing::
 
 .. note::
 
-    If you want to overwrite the status code (which you should do not without a good
-    reason), set the ``X-Status-Code`` header::
-
-        $response = new Response(
-            'Error',
-            404, // this status code will be ignored
-            array(
-                'X-Status-Code' => 200 // this status code will actually be sent to the client
-            )
-        );
-
-    If you do **not** set the ``X-Status-Code`` header, then Symfony uses the following
-    logic to determine the status code:
+    Symfony uses the following logic to determine the HTTP status code of the
+    response:
 
     * If :method:`Symfony\\Component\\HttpFoundation\\Response::isClientError`,
       :method:`Symfony\\Component\\HttpFoundation\\Response::isServerError` or

@@ -71,6 +71,7 @@ The default authentication manager is an instance of
 :class:`Symfony\\Component\\Security\\Core\\Authentication\\AuthenticationProviderManager`::
 
     use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
+    use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
     // instances of Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface
     $providers = array(...);
@@ -140,7 +141,7 @@ password was valid::
         )
     );
 
-    // for some extra checks: is account enabled, locked, expired, etc.?
+    // for some extra checks: is account enabled, locked, expired, etc.
     $userChecker = new UserChecker();
 
     // an array of password encoders (see below)
@@ -229,6 +230,7 @@ own, it just needs to follow these rules:
                }
 
                // ...
+           }
        }
 
 Using Password Encoders
@@ -303,7 +305,6 @@ The ``security.interactive_login`` event is triggered after a user has actively
 logged into your website.  It is important to distinguish this action from
 non-interactive authentication methods, such as:
 
-* authentication based on a "remember me" cookie.
 * authentication based on your session.
 * authentication using a HTTP basic or HTTP digest header.
 

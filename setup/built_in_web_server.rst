@@ -33,16 +33,14 @@ can change the socket passing an IP address and a port as a command-line argumen
 
 .. code-block:: terminal
 
+    # passing a specific IP and port
     $ php bin/console server:start 192.168.0.1:8080
 
-.. note::
+    # passing '*' as the IP means to use 0.0.0.0 (i.e. any local IP address)
+    $ php bin/console server:start *:8080
 
-    You can use the ``--force`` option to force the web server start
-    if the process wasn't correctly stopped (without using the ``server:stop`` command).
-
-    .. code-block:: bash
-
-        $ php bin/console server:start --force
+.. versionadded:: 3.4
+    The support of ``*`` as a valid IP address was introduced in Symfony 3.4.
 
 .. note::
 
@@ -88,13 +86,12 @@ Command Options
 
 The built-in web server expects a "router" script (read about the "router"
 script on `php.net`_) as an argument. Symfony already passes such a router
-script when the command is executed in the ``prod`` or in the ``dev`` environment.
-Use the ``--router`` option in any other environment or to use another router
-script:
+script when the command is executed in the ``prod`` or ``dev`` environment.
+Use the ``--router`` option to use your own router script:
 
 .. code-block:: terminal
 
-    $ php bin/console server:start --env=test --router=app/config/router_test.php
+    $ php bin/console server:start --router=app/config/my_router.php
 
 If your application's document root differs from the standard directory layout,
 you have to pass the correct location using the ``--docroot`` option:

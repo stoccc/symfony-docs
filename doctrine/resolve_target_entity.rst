@@ -21,8 +21,8 @@ without making them hard dependencies.
 Background
 ----------
 
-Suppose you have an `InvoiceBundle` which provides invoicing functionality
-and a `CustomerBundle` that contains customer management tools. You want
+Suppose you have an InvoiceBundle which provides invoicing functionality
+and a CustomerBundle that contains customer management tools. You want
 to keep these separated, because they can be used in other systems without
 each other, but for your application you want to use them together.
 
@@ -123,11 +123,14 @@ about the replacement:
     .. code-block:: xml
 
         <!-- app/config/config.xml -->
+        <?xml version="1.0" encoding="UTF-8" ?>
         <container xmlns="http://symfony.com/schema/dic/services"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:doctrine="http://symfony.com/schema/dic/doctrine"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
-                                http://symfony.com/schema/dic/doctrine http://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/doctrine
+                http://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
 
             <doctrine:config>
                 <doctrine:orm>

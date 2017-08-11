@@ -333,8 +333,8 @@ name of all the templates as an array using the ``with`` keyword:
 
     {# ... #}
 
-The templates can also be located in different bundles, use the functional name
-to reference these templates, e.g. ``AcmeFormExtraBundle:form:fields.html.twig``.
+The templates can also be located in different bundles, use the Twig namespaced
+path to reference these templates, e.g. ``@AcmeFormExtra/form/fields.html.twig``.
 
 Child Forms
 ...........
@@ -485,10 +485,20 @@ rendered.
     .. code-block:: xml
 
         <!-- app/config/config.xml -->
-        <twig:config>
-            <twig:form-theme>form/fields.html.twig</twig:form-theme>
-            <!-- ... -->
-        </twig:config>
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:twig="http://symfony.com/schema/dic/twig"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/twig
+                http://symfony.com/schema/dic/twig/twig-1.0.xsd">
+
+            <twig:config>
+                <twig:form-theme>form/fields.html.twig</twig:form-theme>
+                <!-- ... -->
+            </twig:config>
+        </container>
 
     .. code-block:: php
 
@@ -518,10 +528,20 @@ resource to use such a layout:
     .. code-block:: xml
 
         <!-- app/config/config.xml -->
-        <twig:config>
-            <twig:form-theme>form_table_layout.html.twig</twig:form-theme>
-            <!-- ... -->
-        </twig:config>
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:twig="http://symfony.com/schema/dic/twig"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/twig
+                http://symfony.com/schema/dic/twig/twig-1.0.xsd">
+
+            <twig:config>
+                <twig:form-theme>form_table_layout.html.twig</twig:form-theme>
+                <!-- ... -->
+            </twig:config>
+        </container>
 
     .. code-block:: php
 
@@ -566,14 +586,24 @@ form is rendered.
     .. code-block:: xml
 
         <!-- app/config/config.xml -->
-        <framework:config>
-            <framework:templating>
-                <framework:form>
-                    <resource>AppBundle:Form</resource>
-                </framework:form>
-            </framework:templating>
-            <!-- ... -->
-        </framework:config>
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://symfony.com/schema/dic/symfony"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/symfony
+                http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+            <framework:config>
+                <framework:templating>
+                    <framework:form>
+                        <framework:resource>AppBundle:Form</framework:resource>
+                    </framework:form>
+                </framework:templating>
+                <!-- ... -->
+            </framework:config>
+        </container>
 
     .. code-block:: php
 
@@ -609,14 +639,24 @@ resource to use such a layout:
     .. code-block:: xml
 
         <!-- app/config/config.xml -->
-        <framework:config>
-            <framework:templating>
-                <framework:form>
-                    <resource>FrameworkBundle:FormTable</resource>
-                </framework:form>
-            </framework:templating>
-            <!-- ... -->
-        </framework:config>
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:framework="http://symfony.com/schema/dic/symfony"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/symfony
+                http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+            <framework:config>
+                <framework:templating>
+                    <framework:form>
+                        <resource>FrameworkBundle:FormTable</resource>
+                    </framework:form>
+                </framework:templating>
+                <!-- ... -->
+            </framework:config>
+        </container>
 
     .. code-block:: php
 
@@ -802,7 +842,7 @@ Customizing Error Output
    The Form component only handles *how* the validation errors are rendered,
    and not the actual validation error messages. The error messages themselves
    are determined by the validation constraints you apply to your objects.
-   For more information, see the chapter on :doc:`validation </validation>`.
+   For more information, see the article on :doc:`validation </validation>`.
 
 There are many different ways to customize how errors are rendered when a
 form is submitted with errors. The error messages for a field are rendered
@@ -832,6 +872,8 @@ and customize the ``form_errors`` fragment.
 .. configuration-block::
 
     .. code-block:: html+twig
+
+        {% form_theme form _self %}
 
         {# form_errors.html.twig #}
         {% block form_errors %}
@@ -892,6 +934,8 @@ fields (e.g. a whole form), and not just an individual field.
 .. configuration-block::
 
     .. code-block:: html+twig
+
+        {% form_theme form _self %}
 
         {# form_errors.html.twig #}
         {% block form_errors %}

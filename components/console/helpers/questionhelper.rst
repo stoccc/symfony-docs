@@ -205,6 +205,29 @@ convenient for passwords::
     like in the example above. In this case, a ``RuntimeException``
     would be thrown.
 
+.. note::
+
+    The ``stty`` command is used to get and set properties of the command line
+    (such as getting the number of rows and columns or hiding the input text).
+    On Windows systems, this ``stty`` command may generate gibberish output and
+    mangle the input text. If that's your case, disable it with this command::
+
+        use Symfony\Component\Console\Helper\QuestionHelper;
+        use Symfony\Component\Console\Question\ChoiceQuestion;
+
+        // ...
+        public function execute(InputInterface $input, OutputInterface $output)
+        {
+            // ...
+            $helper = $this->getHelper('question');
+            QuestionHelper::disableStty();
+
+            // ...
+        }
+
+    .. versionadded:: 3.3
+        The ``QuestionHelper::disableStty()`` method was introduced in Symfony 3.3.
+
 Normalizing the Answer
 ----------------------
 
@@ -295,7 +318,7 @@ You can also use a validator with a hidden question::
         $question = new Question('Please enter your password');
         $question->setValidator(function ($value) {
             if (trim($value) == '') {
-                throw new \Exception('The password can not be empty');
+                throw new \Exception('The password cannot be empty');
             }
 
             return $value;
@@ -337,6 +360,9 @@ from the command line, you need to set the inputs that the command expects::
 
         // $this->assertRegExp('/.../', $commandTester->getDisplay());
     }
+
+.. versionadded:: 3.2
+    The ``CommandTester::setInputs()`` method was introduced in Symfony 3.2.
 
 By calling :method:`Symfony\\Component\\Console\\Tester\\CommandTester::setInputs`,
 you imitate what the console would do internally with all user input through the CLI.

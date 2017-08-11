@@ -19,6 +19,7 @@ Configuration
 -------------
 
 * `max_items`_
+* `min_depth`_
 * `max_string_length`_
 * `dump_destination`_
 
@@ -29,6 +30,19 @@ max_items
 
 This is the maximum number of items to dump. Setting this option to ``-1``
 disables the limit.
+
+min_depth
+~~~~~~~~~
+
+**type**: ``integer`` **default**: ``1``
+
+Configures the minimum tree depth until which all items are guaranteed to
+be cloned. After this depth is reached, only ``max_items`` items will be
+cloned. The default value is ``1``, which is consistentcwith older Symfony
+versions.
+
+.. versionadded:: 3.4
+    The ``min_depth`` option was introduced in Symfony 3.4.
 
 max_string_length
 ~~~~~~~~~~~~~~~~~
@@ -53,16 +67,19 @@ destination for dumps. Typically, you would set this to ``php://stderr``:
 
     .. code-block:: yaml
 
+        # app/config/config.yml
         debug:
            dump_destination: php://stderr
 
     .. code-block:: xml
 
+        <!-- app/config/config.xml -->
         <?xml version="1.0" encoding="UTF-8" ?>
         <container xmlns="http://symfony.com/schema/dic/debug"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:debug="http://symfony.com/schema/dic/debug"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd
                 http://symfony.com/schema/dic/debug http://symfony.com/schema/dic/debug/debug-1.0.xsd">
 
             <debug:config dump-destination="php://stderr" />
@@ -70,6 +87,7 @@ destination for dumps. Typically, you would set this to ``php://stderr``:
 
     .. code-block:: php
 
+        // app/config/config.php
         $container->loadFromExtension('debug', array(
            'dump_destination' => 'php://stderr',
         ));

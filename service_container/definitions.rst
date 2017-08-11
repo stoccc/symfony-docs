@@ -31,12 +31,15 @@ There are some helpful methods for working with the service definitions::
     // get the definition with the "app.user_config_manager" ID or alias
     $definition = $container->findDefinition('app.user_config_manager');
 
-    // add a new "app.number_generator" definitions
+    // add a new "app.number_generator" definition
     $definition = new Definition(\AppBundle\NumberGenerator::class);
     $container->setDefinition('app.number_generator', $definition);
 
     // shortcut for the previous method
     $container->register('app.number_generator', \AppBundle\NumberGenerator::class);
+
+    // or create a service whose id matches its class
+    $container->register(\AppBundle\NumberGenerator::class);
 
 Working with a Definition
 -------------------------
@@ -75,6 +78,7 @@ fetched from the container::
 
     use AppBundle\Config\DoctrineConfigManager;
     use Symfony\Component\DependencyInjection\Definition;
+    use Symfony\Component\DependencyInjection\Reference;
 
     $definition = new Definition(DoctrineConfigManager::class, array(
         new Reference('doctrine'), // a reference to another service

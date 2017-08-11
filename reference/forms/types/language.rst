@@ -13,7 +13,8 @@ in the `International Components for Unicode`_ (e.g. ``fr`` or ``zh_Hant``).
 
 .. note::
 
-   The locale of your user is guessed using :phpmethod:`Locale::getDefault`
+   The locale of your user is guessed using :phpmethod:`Locale::getDefault`,
+   which requires the ``intl`` PHP extension to be installed and enabled.
 
 Unlike the ``ChoiceType``, you don't need to specify a ``choices`` option as the
 field type automatically uses a large list of languages. You *can* specify the option
@@ -60,6 +61,12 @@ choices
 
 The choices option defaults to all languages.
 The default locale is used to translate the languages names.
+
+.. caution::
+
+    If you want to override the built-in choices of the language type, you
+    will also have to set the ``choice_loader`` option to ``null``. Not doing
+    so is deprecated since Symfony 3.3.
 
 Inherited Options
 -----------------

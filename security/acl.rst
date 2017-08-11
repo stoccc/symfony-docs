@@ -77,10 +77,12 @@ First, you need to configure the connection the ACL system is supposed to use:
     .. code-block:: php
 
         // app/config/security.php
-        $container->loadFromExtension('security', 'acl', array(
+        $container->loadFromExtension('security', array(
             // ...
 
-            'connection' => 'default',
+            'acl' => array(
+                'connection' => 'default',
+            ),
         ));
 
 .. note::
@@ -91,8 +93,8 @@ First, you need to configure the connection the ACL system is supposed to use:
     domain objects. You can use whatever mapper you like for your objects, be it
     Doctrine ORM, MongoDB ODM, Propel, raw SQL, etc. The choice is yours.
 
-After the connection is configured, you have to import the database structure.
-Fortunately, there is a task for this. Simply run the following command:
+After the connection is configured, you have to import the database structure
+running the following command:
 
 .. code-block:: terminal
 

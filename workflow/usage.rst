@@ -149,8 +149,14 @@ like this:
     A single state marking store does not support a model being on multiple places
     at the same time.
 
+.. tip::
+
+    The ``type`` (default value ``single_state``) and ``arguments`` (default value ``marking``)
+    attributes of the ``marking_store`` option are optional. If omitted, their default values
+    will be used.
+
 With this workflow named ``blog_publishing``, you can get help to decide
-what actions that are allowed on a blog post. ::
+what actions are allowed on a blog post::
 
     $post = new \AppBundle\Entity\BlogPost();
 
@@ -171,10 +177,120 @@ what actions that are allowed on a blog post. ::
 Using Events
 ------------
 
-To make your workflows even more powerful you could construct the ``Workflow``
+To make your workflows more flexible, you can construct the ``Workflow``
 object with an ``EventDispatcher``. You can now create event listeners to
-block transitions (i.e. depending on the data in the blog post). The following
-events are dispatched:
+block transitions (i.e. depending on the data in the blog post) and do
+additional actions when a workflow operation happened (e.g. sending
+announcements).
+
+Each step has three events that are fired in order:
+
+* An event for every workflow;
+* An event for the workflow concerned;
+* An event for the workflow concerned with the specific transition or place name.
+
+When a state transition is initiated, the events are dispatched in the following
+order:
+
+``workflow.guard``
+    Validate whether the transition is allowed at all (:ref:`see below <workflow-usage-guard-events>`).
+
+    The three events being dispatched are:
+
+    * ``workflow.guard``
+    * ``workflow.[workflow name].guard``
+    * ``workflow.[workflow name].guard.[transition name]``
+
+``workflow.leave``
+    The object is about to leave a place.
+
+    The three events being dispatched are:
+
+    * ``workflow.leave``
+    * ``workflow.[workflow name].leave``
+    * ``workflow.[workflow name].leave.[place name]``
+
+``workflow.transition``
+    The object is going through this transition.
+
+    The three events being dispatched are:
+
+    * ``workflow.transition``
+    * ``workflow.[workflow name].transition``
+    * ``workflow.[workflow name].transition.[transition name]``
+
+``workflow.enter``
+    The object entered a new place. This is the first event where the object
+    is marked as being in the new place.
+
+    The three events being dispatched are:
+
+    * ``workflow.enter``
+    * ``workflow.[workflow name].enter``
+    * ``workflow.[workflow name].enter.[place name]``
+
+``workflow.entered``
+
+    Similar to ``workflow.enter``, except the marking store is updated before this
+    event (making it a good place to flush data in Doctrine). 
+
+    The three events being dispatched are:
+
+    * ``workflow.entered``
+    * ``workflow.[workflow name].entered``
+    * ``workflow.[workflow name].entered.[place name]``
+
+``workflow.announce``
+    Triggered for each place that now is available for the object.
+
+    The three events being dispatched are:
+
+    * ``workflow.announce``
+    * ``workflow.[workflow name].announce``
+    * ``workflow.[workflow name].announce.[transition name]``
+
+Here is an example how to enable logging for every time a the "blog_publishing" workflow leaves a place::
+
+    use Psr\Log\LoggerInterface;
+    use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+    use Symfony\Component\Workflow\Event\Event;
+
+    class WorkflowLogger implements EventSubscriberInterface
+    {
+        public function __construct(LoggerInterface $logger)
+        {
+            $this->logger = $logger;
+        }
+
+        public function onLeave(Event $event)
+        {
+            $this->logger->alert(sprintf(
+                'Blog post (id: "%s") performed transaction "%s" from "%s" to "%s"',
+                $event->getSubject()->getId(),
+                $event->getTransition()->getName(),
+                implode(', ', array_keys($event->getMarking()->getPlaces())),
+                implode(', ', $event->getTransition()->getTos())
+            ));
+        }
+
+        public static function getSubscribedEvents()
+        {
+            return array(
+                'workflow.blog_publishing.leave' => 'onLeave',
+            );
+        }
+    }
+
+.. _workflow-usage-guard-events:
+
+Guard Events
+~~~~~~~~~~~~
+
+There are a special kind of events called "Guard events". Their event listeners
+are invoked every time a call to ``Workflow::can``, ``Workflow::apply`` or
+``Workflow::getEnabledTransitions`` is executed. With the guard events you may
+add custom logic to decide what transitions that are valid or not. Here is a list
+of the guard event names.
 
 * ``workflow.guard``
 * ``workflow.[workflow name].guard``
@@ -189,7 +305,7 @@ See example to make sure no blog post without title is moved to "review"::
     {
         public function guardReview(GuardEvent $event)
         {
-            /** @var Acme\BlogPost $post */
+            /** @var \AppBundle\Entity\BlogPost $post */
             $post = $event->getSubject();
             $title = $post->title;
 
@@ -207,21 +323,60 @@ See example to make sure no blog post without title is moved to "review"::
         }
     }
 
-With help from the ``EventDispatcher`` and the ``AuditTrailListener`` you
-could easily enable logging::
 
-    use Symfony\Component\Workflow\EventListener\AuditTrailListener;
+Event Methods
+~~~~~~~~~~~~~
 
-    $logger = new AnyPsr3Logger();
-    $subscriber = new AuditTrailListener($logger);
-    $dispatcher->addSubscriber($subscriber);
+Each workflow event is an instance of :class:`Symfony\\Component\\Workflow\\Event\\Event`.
+This means that each event has access to the following information:
+
+:method:`Symfony\\Component\\Workflow\\Event\\Event::getMarking`
+    Returns the :class:`Symfony\\Component\\Workflow\\Marking` of the workflow.
+
+:method:`Symfony\\Component\\Worflow\\Event\\Event::getSubject`
+    Returns the object that dispatches the event.
+
+:method:`Symfony\\Component\\Workflow\\Event\\Event::getTransition`
+    Returns the :class:`Symfony\\Component\\Workflow\\Transition` that dispatches the event.
+
+:method:`Symfony\\Component\\Workflow\\Event\\Event::getWorkflowName`
+    Returns a string with the name of the workflow that triggered the event.
+
+    .. versionadded:: 3.3
+        The ``getWorkflowName()`` method was introduced in Symfony 3.3.
+
+For Guard Events, there is an extended class :class:`Symfony\\Component\\Workflow\\Event\\GuardEvent`.
+This class has two more methods:
+
+:method:`Symfony\\Component\\Workflow\\Event\\GuardEvent::isBlocked`
+    Returns if transition is blocked.
+
+:method:`Symfony\\Component\\Workflow\\Event\\GuardEvent::setBlocked`
+    Sets the blocked value.
 
 Usage in Twig
 -------------
 
-Using your workflow in your Twig templates reduces the need of domain logic
-in the view layer. Consider this example of the control panel of the blog.
-The links below will only be displayed when the action is allowed:
+Symfony defines several Twig functions to manage workflows and reduce the need
+of domain logic in your templates:
+
+``workflow_can()``
+    Returns ``true`` if the given object can make the given transition.
+
+``workflow_transitions()``
+    Returns an array with all the transitions enabled for the given object.
+
+``workflow_marked_places()``
+    Returns an array with the place names of the given marking.
+
+``workflow_has_marked_place()``
+    Returns ``true`` if the marking of the given object has the given state.
+
+.. versionadded:: 3.3
+    The ``workflow_marked_places()`` and ``workflow_has_marked_place()``
+    functions were introduced in Symfony 3.3.
+
+The following example shows these functions in action:
 
 .. code-block:: twig
 
@@ -236,9 +391,19 @@ The links below will only be displayed when the action is allowed:
         <a href="...">Reject article</a>
     {% endif %}
 
-    {# Or loop through the enabled transistions #}
+    {# Or loop through the enabled transitions #}
     {% for transition in workflow_transitions(post) %}
         <a href="...">{{ transition.name }}</a>
     {% else %}
         No actions available.
     {% endfor %}
+
+    {# Check if the object is in some specific place #}
+    {% if workflow_has_marked_place(post, 'to_review') %}
+        <p>This post is ready for review.</p>
+    {% endif %}
+
+    {# Check if some place has been marked on the object #}
+    {% if 'waiting_some_approval' in workflow_marked_places(post) %}
+        <span class="label">PENDING</span>
+    {% endif %}

@@ -4,11 +4,11 @@
 How to Set external Parameters in the Service Container
 =======================================================
 
-In the chapter :doc:`/configuration`, you learned how to manage your application
-configuration. At times, it may benefit your application
-to store certain credentials outside of your project code. Database configuration
-is one such example. The flexibility of the Symfony service container allows
-you to easily do this.
+In the article :doc:`/configuration`, you learned how to manage your application
+configuration. At times, it may benefit your application to store certain
+credentials outside of your project code. Database configuration is one such
+example. The flexibility of the Symfony service container allows you to easily
+do this.
 
 Environment Variables
 ---------------------
@@ -22,7 +22,7 @@ will be resolved at runtime (once per request), so that dumped containers can be
 reconfigured dynamically even after being compiled.
 
 For example, if you want to use the value of the ``DATABASE_HOST`` environment
-variable in you service container configuration, you can reference it using
+variable in your service container configuration, you can reference it using
 ``%env(DATABASE_HOST)%`` in your configuration files:
 
 .. configuration-block::
@@ -37,14 +37,22 @@ variable in you service container configuration, you can reference it using
     .. code-block:: xml
 
         <!-- app/config/config.xml -->
-        <!-- xmlns:doctrine="http://symfony.com/schema/dic/doctrine" -->
-        <!-- xsi:schemaLocation="http://symfony.com/schema/dic/doctrine http://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd"> -->
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:doctrine="http://symfony.com/schema/dic/doctrine"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/doctrine
+                http://symfony.com/schema/dic/doctrine/doctrine-1.0.xsd">
 
-        <doctrine:config>
-            <doctrine:dbal
-                host="%env(DATABASE_HOST)%"
-            />
-        </doctrine:config>
+            <doctrine:config>
+                <doctrine:dbal
+                    host="%env(DATABASE_HOST)%"
+                />
+            </doctrine:config>
+
+        </container>
 
     .. code-block:: php
 
@@ -104,8 +112,8 @@ of the following:
 
     .. code-block:: nginx
 
-        fastcgi_param DATABASE_USER user
-        fastcgi_param DATABASE_PASSWORD secret
+        fastcgi_param DATABASE_USER user;
+        fastcgi_param DATABASE_PASSWORD secret;
 
     .. code-block:: terminal
 
@@ -113,6 +121,12 @@ of the following:
         $ export DATABASE_PASSWORD=secret
 
 .. tip::
+
+    .. versionadded:: 3.3
+        The support of the special ``SYMFONY__`` environment variables was
+        deprecated in Symfony 3.3 and it will be removed in 4.0. Instead of
+        using those variables, define regular environment variables and get
+        their values using the ``%env(...)%`` syntax in your config files.
 
     You can also define the default value of any existing parameters using
     special environment variables named after their corresponding parameter
@@ -145,9 +159,17 @@ in the container. The following imports a file named ``parameters.php``.
     .. code-block:: xml
 
         <!-- app/config/config.xml -->
-        <imports>
-            <import resource="parameters.php" />
-        </imports>
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+            <imports>
+                <import resource="parameters.php" />
+            </imports>
+
+        </container>
 
     .. code-block:: php
 

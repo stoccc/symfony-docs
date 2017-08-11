@@ -4,20 +4,23 @@
 How to Use a Custom Version Strategy for Assets
 ===============================================
 
-.. versionadded:: 3.1
-    Support for custom version strategies was introduced in Symfony 3.1.
-
 Asset versioning is a technique that improves the performance of web
 applications by adding a version identifier to the URL of the static assets
 (CSS, JavaScript, images, etc.) When the content of the asset changes, its
 identifier is also modified to force the browser to download it again instead of
 reusing the cached asset.
 
-Symfony supports asset versioning thanks to the :ref:`version <reference-framework-assets-version>`
-and :ref:`version_format <reference-assets-version-format>` configuration
-options. If your application requires a more advanced versioning, such as
-generating the version dynamically based on some external information, you can
-create your own version strategy.
+If your application requires advanced versioning, such as generating the
+version dynamically based on some external information, you can create your
+own version strategy.
+
+.. note::
+
+    Symfony provides various cache busting implementations via the
+    :ref:`version <reference-framework-assets-version>`,
+    :ref:`version_format <reference-assets-version-format>`, and
+    :ref:`json_manifest_path <reference-assets-json-manifest-path>`
+    configuration options.
 
 Creating your Own Asset Version Strategy
 ----------------------------------------
@@ -100,7 +103,7 @@ version string::
             return $versionized;
         }
 
-        private function loadManifest(array $options)
+        private function loadManifest()
         {
             return json_decode(file_get_contents($this->manifestPath), true);
         }
@@ -117,10 +120,9 @@ After creating the strategy PHP class, register it as a Symfony service.
 
         # app/config/services.yml
         services:
-            app.assets.versioning.gulp_buster:
-                class: AppBundle\Asset\VersionStrategy\GulpBusterVersionStrategy
+            AppBundle\Asset\VersionStrategy\GulpBusterVersionStrategy:
                 arguments:
-                    - "%kernel.root_dir%/../busters.json"
+                    - "%kernel.project_dir%/busters.json"
                     - "%%s?version=%%s"
                 public: false
 
@@ -134,9 +136,8 @@ After creating the strategy PHP class, register it as a Symfony service.
                 http://symfony.com/schema/dic/services/services-1.0.xsd"
         >
             <services>
-                <service id="app.assets.versioning.gulp_buster"
-                 class="AppBundle\Asset\VersionStrategy\GulpBusterVersionStrategy" public="false">
-                    <argument>%kernel.root_dir%/../busters.json</argument>
+                <service id="AppBundle\Asset\VersionStrategy\GulpBusterVersionStrategy" public="false">
+                    <argument>%kernel.project_dir%/busters.json</argument>
                     <argument>%%s?version=%%s</argument>
                 </service>
             </services>
@@ -146,17 +147,15 @@ After creating the strategy PHP class, register it as a Symfony service.
 
         // app/config/services.php
         use Symfony\Component\DependencyInjection\Definition;
+        use AppBundle\Asset\VersionStrategy\GulpBusterVersionStrategy;
 
-        $definition = new Definition(
-            'AppBundle\Asset\VersionStrategy\GulpBusterVersionStrategy',
-            array(
-                '%kernel.root_dir%/../busters.json',
-                '%%s?version=%%s',
-            )
-        );
-        $definition->setPublic(false);
-
-        $container->setDefinition('app.assets.versioning.gulp_buster', $definition);
+        $container->autowire(GulpBusterVersionStrategy::class)
+            ->setArguments(
+                array(
+                    '%kernel.project_dir%/busters.json',
+                    '%%s?version=%%s',
+                )
+        )->setPublic(false);
 
 Finally, enable the new asset versioning for all the application assets or just
 for some :ref:`asset package <reference-framework-assets-packages>` thanks to
@@ -170,7 +169,7 @@ the :ref:`version_strategy <reference-assets-version-strategy>` option:
         framework:
             # ...
             assets:
-                version_strategy: 'app.assets.versioning.gulp_buster'
+                version_strategy: 'AppBundle\Asset\VersionStrategy\GulpBusterVersionStrategy'
 
     .. code-block:: xml
 
@@ -183,17 +182,19 @@ the :ref:`version_strategy <reference-assets-version-strategy>` option:
                 http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
             <framework:config>
-                <framework:assets version-strategy="app.assets.versioning.gulp_buster" />
+                <framework:assets version-strategy="AppBundle\Asset\VersionStrategy\GulpBusterVersionStrategy" />
             </framework:config>
         </container>
 
     .. code-block:: php
 
         // app/config/config.php
+        use AppBundle\Asset\VersionStrategy\GulpBusterVersionStrategy;
+
         $container->loadFromExtension('framework', array(
             // ...
             'assets' => array(
-                'version_strategy' => 'app.assets.versioning.gulp_buster',
+                'version_strategy' => GulpBusterVersionStrategy::class,
             ),
         ));
 
