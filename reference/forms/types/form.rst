@@ -80,6 +80,8 @@ option on the form.
 
 .. include:: /reference/forms/types/options/data_class.rst.inc
 
+.. _reference-form-option-empty-data:
+
 .. include:: /reference/forms/types/options/empty_data.rst.inc
     :end-before: DEFAULT_PLACEHOLDER
 
@@ -150,7 +152,7 @@ The following options are defined in the
 :class:`Symfony\\Component\\Form\\Extension\\Core\\Type\\BaseType` class.
 The ``BaseType`` class is the parent class for both the ``form`` type and
 the :doc:`button type </reference/forms/types/button>`, but it is not part
-of the form type tree (i.e. it can not be used as a form type on its own).
+of the form type tree (i.e. it cannot be used as a form type on its own).
 
 .. include:: /reference/forms/types/options/attr.rst.inc
 

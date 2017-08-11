@@ -10,7 +10,7 @@ at its core, the skills used to master a symfony1 project continue to be
 very relevant when developing in Symfony2. Sure, ``app.yml`` is gone, but
 routing, controllers and templates all remain.
 
-This chapter walks through the differences between symfony1 and Symfony2.
+This article walks through the differences between symfony1 and Symfony2.
 As you'll see, many tasks are tackled in a slightly different way. You'll
 come to appreciate these minor differences as they promote stable, predictable,
 testable and decoupled code in your Symfony2 applications.
@@ -274,10 +274,10 @@ do the following:
 
         <!-- app/config/routing.yml -->
         <?xml version="1.0" encoding="UTF-8" ?>
-
         <routes xmlns="http://symfony.com/schema/routing"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+            xsi:schemaLocation="http://symfony.com/schema/routing
+                http://symfony.com/schema/routing/routing-1.0.xsd">
 
             <import resource="@AcmeDemoBundle/Resources/config/routing.xml" />
         </routes>
@@ -309,9 +309,16 @@ You can use this same strategy to bring in configuration from a bundle:
     .. code-block:: xml
 
         <!-- app/config/config.xml -->
-        <imports>
-            <import resource="@AcmeDemoBundle/Resources/config/config.xml" />
-        </imports>
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+            <imports>
+                <import resource="@AcmeDemoBundle/Resources/config/config.xml" />
+            </imports>
+        </container>
 
     .. code-block:: php
 
@@ -342,9 +349,16 @@ key of your configuration:
 
     .. code-block:: xml
 
-        <parameters>
-            <parameter key="email.from_address">foo.bar@example.com</parameter>
-        </parameters>
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+            <parameters>
+                <parameter key="email.from_address">foo.bar@example.com</parameter>
+            </parameters>
+        </container>
 
     .. code-block:: php
 
@@ -359,7 +373,7 @@ You can now access this from a controller, for example::
 
 In reality, the Symfony2 configuration is much more powerful and is used
 primarily to configure objects that you can use. For more information, see
-the chapter titled ":doc:`/service_container`".
+the article titled ":doc:`/service_container`".
 
 .. _`Composer`: https://getcomposer.org
 .. _`Symfony Standard Edition`: https://github.com/symfony/symfony-standard

@@ -5,13 +5,13 @@ Security
 ========
 
 Symfony's security system is incredibly powerful, but it can also be confusing
-to set up. In this chapter, you'll learn how to set up your application's security
+to set up. In this article, you'll learn how to set up your application's security
 step-by-step, from configuring your firewall and how you load users to denying
 access and fetching the User object. Depending on what you need, sometimes
 the initial setup can be tough. But once it's done, Symfony's security system
 is both flexible and (hopefully) fun to work with.
 
-Since there's a lot to talk about, this chapter is organized into a few big
+Since there's a lot to talk about, this article is organized into a few big
 sections:
 
 #. Initial ``security.yml`` setup (*authentication*);
@@ -25,6 +25,7 @@ like :ref:`logging out <security-logging-out>` and
 :doc:`encoding user passwords </security/password_encoding>`.
 
 .. _security-firewalls:
+.. _firewalls-authentication:
 
 1) Initial security.yml Setup (Authentication)
 ----------------------------------------------
@@ -47,7 +48,7 @@ configuration looks like this:
                     pattern: ^/(_(profiler|wdt)|css|images|js)/
                     security: false
 
-                default:
+                main:
                     anonymous: ~
 
     .. code-block:: xml
@@ -69,7 +70,7 @@ configuration looks like this:
                     pattern="^/(_(profiler|wdt)|css|images|js)/"
                     security="false" />
 
-                <firewall name="default">
+                <firewall name="main">
                     <anonymous />
                 </firewall>
             </config>
@@ -86,11 +87,11 @@ configuration looks like this:
             ),
             'firewalls' => array(
                 'dev' => array(
-                    'pattern'    => '^/(_(profiler|wdt)|css|images|js)/',
-                    'security'   => false,
+                    'pattern'   => '^/(_(profiler|wdt)|css|images|js)/',
+                    'security'  => false,
                 ),
-                'default' => array(
-                    'anonymous'  => null,
+                'main' => array(
+                    'anonymous' => null,
                 ),
             ),
         ));
@@ -105,7 +106,7 @@ by your security.
     You can also match a request against other details of the request (e.g. host). For more
     information and examples read :doc:`/security/firewall_restriction`.
 
-All other URLs will be handled by the ``default`` firewall (no ``pattern``
+All other URLs will be handled by the ``main`` firewall (no ``pattern``
 key means it matches *all* URLs). You can think of the firewall like your
 security system, and so it usually makes sense to have just one main firewall.
 But this does *not* mean that every URL requires authentication - the ``anonymous``
@@ -143,7 +144,7 @@ To activate this, add the ``http_basic`` key under your firewall:
 
             firewalls:
                 # ...
-                default:
+                main:
                     anonymous: ~
                     http_basic: ~
 
@@ -160,7 +161,7 @@ To activate this, add the ``http_basic`` key under your firewall:
             <config>
                 <!-- ... -->
 
-                <firewall name="default">
+                <firewall name="main">
                     <anonymous />
                     <http-basic />
                 </firewall>
@@ -174,7 +175,7 @@ To activate this, add the ``http_basic`` key under your firewall:
             // ...
             'firewalls' => array(
                 // ...
-                'default' => array(
+                'main' => array(
                     'anonymous'  => null,
                     'http_basic' => null,
                 ),
@@ -215,7 +216,7 @@ user to be logged in to access this URL:
             # ...
             firewalls:
                 # ...
-                default:
+                main:
                     # ...
 
             access_control:
@@ -235,7 +236,7 @@ user to be logged in to access this URL:
             <config>
                 <!-- ... -->
 
-                <firewall name="default">
+                <firewall name="main">
                     <!-- ... -->
                 </firewall>
 
@@ -251,13 +252,13 @@ user to be logged in to access this URL:
             // ...
             'firewalls' => array(
                 // ...
-                'default' => array(
+                'main' => array(
                     // ...
                 ),
             ),
            'access_control' => array(
                // require ROLE_ADMIN for /admin*
-                array('path' => '^/admin', 'role' => 'ROLE_ADMIN'),
+                array('path' => '^/admin', 'roles' => 'ROLE_ADMIN'),
             ),
         ));
 
@@ -450,6 +451,7 @@ If you'd like to load your users via the Doctrine ORM, that's easy! See
 :doc:`/security/entity_provider` for all the details.
 
 .. _security-encoding-user-password:
+.. _encoding-the-user-s-password:
 
 C) Encoding the User's Password
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -705,7 +707,7 @@ URL pattern. You saw this earlier, where anything matching the regular expressio
 
             firewalls:
                 # ...
-                default:
+                main:
                     # ...
 
             access_control:
@@ -725,7 +727,7 @@ URL pattern. You saw this earlier, where anything matching the regular expressio
             <config>
                 <!-- ... -->
 
-                <firewall name="default">
+                <firewall name="main">
                     <!-- ... -->
                 </firewall>
 
@@ -742,7 +744,7 @@ URL pattern. You saw this earlier, where anything matching the regular expressio
 
             'firewalls' => array(
                 // ...
-                'default' => array(
+                'main' => array(
                     // ...
                 ),
             ),
@@ -902,7 +904,7 @@ the built-in helper function:
 
 If you use this function and you are *not* behind a firewall, an exception will
 be thrown. Again, it's almost always a good idea to have a main firewall that
-covers all URLs (as shown before in this chapter).
+covers all URLs (as shown before in this article).
 
 .. caution::
 

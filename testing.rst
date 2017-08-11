@@ -12,7 +12,7 @@ The PHPUnit Testing Framework
 -----------------------------
 
 Symfony integrates with an independent library - called PHPUnit - to give
-you a rich testing framework. This chapter won't cover PHPUnit itself, but
+you a rich testing framework. This article won't cover PHPUnit itself, but
 it has its own excellent `documentation`_.
 
 .. note::
@@ -71,8 +71,9 @@ of your bundle::
     namespace AppBundle\Tests\Util;
 
     use AppBundle\Util\Calculator;
+    use PHPUnit\Framework\TestCase;
 
-    class CalculatorTest extends \PHPUnit_Framework_TestCase
+    class CalculatorTest extends TestCase
     {
         public function testAdd()
         {
@@ -284,8 +285,9 @@ document::
 
         // Assert that the response is a redirect to /demo/contact
         $this->assertTrue(
-            $client->getResponse()->isRedirect('/demo/contact'),
-            'response is a redirect to /demo/contact'
+            $client->getResponse()->isRedirect('/demo/contact')
+            // if the redirection URL was generated as an absolute URL
+            // $client->getResponse()->isRedirect('http://localhost/demo/contact')
         );
         // ...or simply check that the response is a redirect to any URL
         $this->assertTrue($client->getResponse()->isRedirect());
@@ -464,7 +466,7 @@ Injection Container::
     $container = $client->getContainer();
 
 For a list of services available in your application, use the ``debug:container``
-console task.
+command.
 
 .. versionadded:: 2.6
     Prior to Symfony 2.6, this command was called ``container:debug``.
@@ -729,7 +731,7 @@ add the values to the raw data array::
     $values['task']['tags'][1]['name'] = 'bar';
 
     // Submit the form with the existing and new values.
-    $crawler = $this->client->request($form->getMethod(), $form->getUri(), $values,
+    $crawler = $client->request($form->getMethod(), $form->getUri(), $values,
         $form->getPhpFiles());
 
     // The 2 tags have been added to the collection.

@@ -42,12 +42,13 @@ and which reverse proxy IP addresses will be doing this type of thing:
         <container xmlns="http://symfony.com/schema/dic/services"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:framework="http://symfony.com/schema/dic/symfony"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
-                                http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
             <framework:config trusted-proxies="192.0.0.1, 10.0.0.0/8">
                 <!-- ... -->
-            </framework>
+            </framework:config>
         </container>
 
     .. code-block:: php
@@ -82,15 +83,17 @@ In this case, you'll need to - *very carefully* - trust *all* proxies.
 
 #. Once you've guaranteed that traffic will only come from your trusted reverse
    proxies, configure Symfony to *always* trust incoming request. This is
-   done inside of your front controller::
+   done inside of your front controller:
 
-       // web/app.php
+   .. code-block:: diff
 
-       // ...
-       Request::setTrustedProxies(array('127.0.0.1', $request->server->get('REMOTE_ADDR')));
+        // web/app.php
 
-       $response = $kernel->handle($request);
-       // ...
+        // ...
+        $request = Request::createFromGlobals();
+        + Request::setTrustedProxies(array('127.0.0.1', $request->server->get('REMOTE_ADDR')));
+
+        // ...
 
 #. Ensure that the trusted_proxies setting in your ``app/config/config.yml``
    is not set or it will overwrite the ``setTrustedProxies()`` call above.

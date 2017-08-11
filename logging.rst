@@ -287,7 +287,7 @@ option of your handler to ``rotating_file``:
                     type="rotating_file"
                     path="%kernel.logs_dir%/%kernel.environment%.log"
                     level="debug"
-                    max_files="10"
+                    max-files="10"
                 />
             </monolog:config>
         </container>
@@ -307,6 +307,15 @@ option of your handler to ``rotating_file``:
                 ),
             ),
         ));
+
+Using a Logger inside a Service
+-------------------------------
+
+To use a logger in your own services, add the ``@logger`` service as an argument
+of those services. If you want to use a pre-configured logger which uses a
+specific channel (``app`` by default), use the ``monolog.logger`` tag  with the
+``channel`` property as explained in the
+:ref:`Dependency Injection reference <dic_tags-monolog>`.
 
 Adding extra Data to each Log (e.g. a unique request token)
 -----------------------------------------------------------

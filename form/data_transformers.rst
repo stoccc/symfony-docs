@@ -35,7 +35,7 @@ Suppose you have a Task form with a tags ``text`` type::
     {
         public function buildForm(FormBuilderInterface $builder, array $options)
         {
-            $builder->add('tags', 'text')
+            $builder->add('tags', 'text');
         }
 
         public function configureOptions(OptionsResolver $resolver)
@@ -202,7 +202,7 @@ to and from the issue number and the ``Issue`` object::
             }
 
             $issue = $this->manager
-                ->getRepository('AppBundle:Issue')
+                ->getRepository(Issue::class)
                 // query for the issue with this id
                 ->find($issueNumber)
             ;
@@ -408,19 +408,12 @@ it's recognized as a custom field type:
 
         // app/config/services.php
         use AppBundle\Form\IssueSelectorType;
-        use Symfony\Component\DependencyInjection\Definition;
         use Symfony\Component\DependencyInjection\Reference;
         // ...
 
-        $container
-            ->setDefinition('app.type.issue_selector', new Definition(
-                IssueSelectorType::class,
-                array(
-                    new Reference('doctrine.orm.entity_manager'),
-                )
-            ))
-            ->addTag('form.type')
-        ;
+        $container->register('app.type.issue_selector', IssueSelectorType::class)
+            ->addArgument(new Reference('doctrine.orm.entity_manager'))
+            ->addTag('form.type');
 
 Now, whenever you need to use your special ``issue_selector`` field type,
 it's quite easy::

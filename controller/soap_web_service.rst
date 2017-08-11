@@ -8,7 +8,7 @@ How to Create a SOAP Web Service in a Symfony Controller
 
 Setting up a controller to act as a SOAP server is simple with a couple
 tools. You must, of course, have the `PHP SOAP`_ extension installed.
-As the PHP SOAP extension can not currently generate a WSDL, you must either
+As the PHP SOAP extension cannot currently generate a WSDL, you must either
 create one from scratch or use a 3rd party generator.
 
 .. note::
@@ -39,9 +39,8 @@ In this case, the SOAP service will allow the client to call a method called
         public function hello($name)
         {
 
-            $message = \Swift_Message::newInstance()
+            $message = new \Swift_Message('Hello Service')
                                     ->setTo('me@example.com')
-                                    ->setSubject('Hello Service')
                                     ->setBody($name . ' says hi!');
 
             $this->mailer->send($message);
@@ -68,11 +67,19 @@ a ``HelloService`` object properly:
     .. code-block:: xml
 
         <!-- app/config/services.xml -->
-        <services>
-            <service id="hello_service" class="Acme\SoapBundle\Services\HelloService">
-                <argument type="service" id="mailer"/>
-            </service>
-        </services>
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+            <services>
+                <service id="hello_service" class="Acme\SoapBundle\Services\HelloService">
+                    <argument type="service" id="mailer"/>
+                </service>
+            </services>
+
+        </container>
 
     .. code-block:: php
 

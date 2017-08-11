@@ -13,7 +13,7 @@ which are like simple conditional statements.
 
     Take a look at the
     :doc:`authorization </components/security/authorization>`
-    chapter for an even deeper understanding on voters.
+    article for an even deeper understanding on voters.
 
 How Symfony Uses Voters
 -----------------------
@@ -160,8 +160,8 @@ and tag it with ``security.voter``:
         # app/config/services.yml
         services:
             security.access.post_voter:
-                class:      AppBundle\Security\PostVoter
-                public:     false
+                class:  AppBundle\Security\PostVoter
+                public: false
                 tags:
                     - { name: security.voter }
 
@@ -279,7 +279,7 @@ security configuration:
         >
 
             <config>
-                <access-decision-manager strategy="unanimous">
+                <access-decision-manager strategy="unanimous" />
             </config>
         </srv:container>
 

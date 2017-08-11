@@ -114,7 +114,7 @@ Each part will be explained in the next section.
                     pattern: .*
                     # restrict the firewall to a specific host
                     host: admin\.example\.com
-                     # restrict the firewall to specific http methods
+                    # restrict the firewall to specific HTTP methods
                     methods: [GET, POST]
                     request_matcher: some.service.id
                     access_denied_url: /foo/error403
@@ -318,10 +318,44 @@ request to the ``check_path`` URL.
 Redirecting after Login
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-* ``always_use_default_target_path`` (type: ``boolean``, default: ``false``)
-* ``default_target_path`` (type: ``string``, default: ``/``)
-* ``target_path_parameter`` (type: ``string``, default: ``_target_path``)
-* ``use_referer`` (type: ``boolean``, default: ``false``)
+always_use_default_target_path
+..............................
+
+**type**: ``boolean`` **default**: ``false``
+
+If ``true``, users are always redirected to the default target path regardless
+of the previous URL that was stored in the session.
+
+default_target_path
+....................
+
+**type**: ``string`` **default**: ``/``
+
+The page users are redirected to when there is no previous page stored in the
+session (for example, when the users browse the login page directly).
+
+target_path_parameter
+.....................
+
+**type**: ``string`` **default**: ``_target_path``
+
+When using a login form, if you include an HTML element to set the target path,
+this option lets you change the name of the HTML element itself.
+
+use_referer
+...........
+
+**type**: ``boolean`` **default**: ``false``
+
+If ``true``, the user is redirected to the value stored in the ``HTTP_REFERER``
+header when no previous URL was stored in the session. If the referrer URL is
+the same as the one generated with the ``login_path`` route, the user is
+redirected to the ``default_target_path`` to avoid a redirection loop.
+
+.. note::
+
+    For historical reasons, and to match the misspelling of the HTTP standard,
+    the option is called ``use_referer`` instead of ``use_referrer``.
 
 .. _reference-security-pbkdf2:
 
@@ -383,14 +417,22 @@ Using the BCrypt Password Encoder
     .. code-block:: xml
 
         <!-- app/config/security.xml -->
-        <config>
-            <!-- ... -->
-            <encoder
-                class="Symfony\Component\Security\Core\User\User"
-                algorithm="bcrypt"
-                cost="15"
-            />
-        </config>
+        <?xml version="1.0" charset="UTF-8" ?>
+        <srv:container xmlns="http://symfony.com/schema/dic/security"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:srv="http://symfony.com/schema/dic/services"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+            <config>
+                <!-- ... -->
+                <encoder
+                    class="Symfony\Component\Security\Core\User\User"
+                    algorithm="bcrypt"
+                    cost="15"
+                />
+            </config>
+        </srv:container>
 
     .. code-block:: php
 
@@ -465,14 +507,22 @@ multiple firewalls, the "context" could actually be shared:
     .. code-block:: xml
 
         <!-- app/config/security.xml -->
-        <security:config>
-            <firewall name="somename" context="my_context">
-                <! ... ->
-            </firewall>
-            <firewall name="othername" context="my_context">
-                <! ... ->
-            </firewall>
-        </security:config>
+        <?xml version="1.0" charset="UTF-8" ?>
+        <srv:container xmlns="http://symfony.com/schema/dic/security"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:srv="http://symfony.com/schema/dic/services"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+            <config>
+                <firewall name="somename" context="my_context">
+                    <!-- ... -->
+                </firewall>
+                <firewall name="othername" context="my_context">
+                    <!-- ... -->
+                </firewall>
+            </config>
+        </srv:container>
 
     .. code-block:: php
 
@@ -489,6 +539,13 @@ multiple firewalls, the "context" could actually be shared:
                 ),
             ),
         ));
+
+.. note::
+
+    The firewall context key is stored in session, so every firewall using it
+    must set its ``stateless`` option to ``false``. Otherwise, the context is
+    ignored and you won't be able to authenticate on multiple firewalls at the
+    same time.
 
 HTTP-Digest Authentication
 --------------------------
@@ -510,11 +567,19 @@ To use HTTP-Digest authentication you need to provide a realm and a key:
     .. code-block:: xml
 
         <!-- app/config/security.xml -->
-        <security:config>
-            <firewall name="somename">
-                <http-digest key="a_random_string" realm="secure-api" />
-            </firewall>
-        </security:config>
+        <?xml version="1.0" charset="UTF-8" ?>
+        <srv:container xmlns="http://symfony.com/schema/dic/security"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:srv="http://symfony.com/schema/dic/services"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+            <config>
+                <firewall name="somename">
+                    <http-digest key="a_random_string" realm="secure-api" />
+                </firewall>
+            </config>
+        </srv:container>
 
     .. code-block:: php
 

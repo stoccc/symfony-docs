@@ -8,7 +8,7 @@ According to the official `YAML`_ website, YAML is "a human friendly data
 serialization standard for all programming languages".
 
 Even if the YAML format can describe complex nested data structure, this
-chapter only describes the minimum set of features needed to use YAML as a
+article only describes the minimum set of features needed to use YAML as a
 configuration file format.
 
 YAML is a simple language that describes data. As PHP, it has a syntax for
@@ -299,5 +299,23 @@ Comments can be added in YAML by prefixing them with a hash mark (``#``):
 
     Comments are simply ignored by the YAML parser and do not need to be
     indented according to the current level of nesting in a collection.
+
+Explicit Typing
+---------------
+
+The YAML specification defines some tags to set the type of any data explicitly:
+
+.. code-block:: yaml
+
+    data:
+        # this value is parsed as a float number (it will be 3.0 instead of 3)
+        price: !!float 3
+
+        # this value is parsed as binary data encoded in base64
+        picture: !!binary |
+            R0lGODlhDAAMAIQAAP//9/X
+            17unp5WZmZgAAAOfn515eXv
+            Pz7Y6OjuDg4J+fn5OTk6enp
+            56enmleECcgggoBADs=
 
 .. _YAML: http://yaml.org/

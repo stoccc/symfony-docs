@@ -24,7 +24,7 @@ First you need to create a Constraint class and extend :class:`Symfony\\Componen
      */
     class ContainsAlphanumeric extends Constraint
     {
-        public $message = 'The string "%string%" contains an illegal character: it can only contain letters or numbers.';
+        public $message = 'The string "{{ string }}" contains an illegal character: it can only contain letters or numbers.';
     }
 
 .. note::
@@ -45,7 +45,7 @@ includes some simple default logic::
     // in the base Symfony\Component\Validator\Constraint class
     public function validatedBy()
     {
-        return get_class($this).'Validator';
+        return ContainsAlphanumericValidator::class;
     }
 
 In other words, if you create a custom ``Constraint`` (e.g. ``MyConstraint``),
@@ -67,14 +67,14 @@ The validator class is also simple, and only has one required method ``validate(
             if (!preg_match('/^[a-zA-Z0-9]+$/', $value, $matches)) {
                 // If you're using the new 2.5 validation API (you probably are!)
                 $this->context->buildViolation($constraint->message)
-                    ->setParameter('%string%', $value)
+                    ->setParameter('{{ string }}', $value)
                     ->addViolation();
 
                 // If you're using the old 2.4 validation API
                 /*
                 $this->context->addViolation(
                     $constraint->message,
-                    array('%string%' => $value)
+                    array('{{ string }}' => $value)
                 );
                 */
             }
@@ -183,10 +183,19 @@ tag so that the validation system knows about it:
     .. code-block:: xml
 
         <!-- app/config/services.xml -->
-        <service id="app.contains_alphanumeric_validator" class="AppBundle\Validator\Constraints\ContainsAlphanumericValidator">
-            <argument type="service" id="doctrine.orm.default_entity_manager" />
-            <tag name="validator.constraint_validator" />
-        </service>
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+            <services>
+                <service id="app.contains_alphanumeric_validator" class="AppBundle\Validator\Constraints\ContainsAlphanumericValidator">
+                    <argument type="service" id="doctrine.orm.default_entity_manager" />
+                    <tag name="validator.constraint_validator" />
+                </service>
+            </services>
+        </container>
 
     .. code-block:: php
 
@@ -202,9 +211,9 @@ load this service from the container.
 
 .. note::
 
-    In earlier versions of Symfony, the tag required an ``alias`` key (usually set
-    to the class name). This is still allowed your constraint's ``validateBy()``
-    method can return this alias (instead of a class name).
+    In earlier versions of Symfony, the tag required an ``alias`` key (usually
+    set to the class name). This ``alias`` is now optional, but if you define
+    it, your constraint's ``validatedBy()`` method must return the same value.
 
 Class Constraint Validator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

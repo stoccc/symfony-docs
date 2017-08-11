@@ -14,7 +14,7 @@ hunt down and update to make the change? If you're using Symfony's router,
 the change is simple.
 
 The Symfony router lets you define creative URLs that you map to different
-areas of your application. By the end of this chapter, you'll be able to:
+areas of your application. By the end of this article, you'll be able to:
 
 * Create complex routes that map to controllers
 * Generate URLs inside templates and controllers
@@ -72,12 +72,12 @@ The route is simple:
 
         # app/config/routing.yml
         blog_list:
-            path:      /blog
-            defaults:  { _controller: AppBundle:Blog:list }
+            path:     /blog
+            defaults: { _controller: AppBundle:Blog:list }
 
         blog_show:
-            path:      /blog/{slug}
-            defaults:  { _controller: AppBundle:Blog:show }
+            path:     /blog/{slug}
+            defaults: { _controller: AppBundle:Blog:show }
 
     .. code-block:: xml
 
@@ -535,6 +535,12 @@ and method: ``AppBundle\Controller\BlogController::showAction``. But if you
 follow some simple conventions, the logical name is more concise and allows
 more flexibility.
 
+.. tip::
+
+   To refer to an action that is implemented as the ``__invoke()`` method of a controller class,
+   you do not have to pass the method name, but can just use the fully qualified class name (e.g.
+   ``AppBundle\Controller\BlogController``).
+
 .. note::
 
    In addition to using the logical name or the fully-qualified class name,
@@ -652,7 +658,7 @@ But if you pass extra ones, they will be added to the URI as a query string::
 Generating URLs from a Template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To generate URLs inside Twig, see the templating chapter: :ref:`templating-pages`.
+To generate URLs inside Twig, see the templating article: :ref:`templating-pages`.
 If you also need to generate URLs in JavaScript, see :doc:`/routing/generate_url_javascript`.
 
 .. index::
@@ -710,6 +716,15 @@ route::
     // or, in Twig
     // {{ path('blog_show', {'slug': 'slug-value'}) }}
 
+Translating Routes
+------------------
+
+Symfony doesn't support defining routes with different contents depending on the
+user language. In those cases, you can define multiple routes per controller,
+one for each supported language; or use any of the bundles created by the
+community to implement this feature, such as `JMSI18nRoutingBundle`_ and
+`BeSimpleI18nRoutingBundle`_.
+
 Summary
 -------
 
@@ -737,3 +752,6 @@ Learn more about Routing
     :glob:
 
     routing/*
+
+.. _`JMSI18nRoutingBundle`: https://github.com/schmittjoh/JMSI18nRoutingBundle
+.. _`BeSimpleI18nRoutingBundle`: https://github.com/BeSimple/BeSimpleI18nRoutingBundle

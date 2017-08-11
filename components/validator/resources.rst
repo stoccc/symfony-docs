@@ -45,7 +45,7 @@ In this example, the validation metadata is retrieved executing the
         public static function loadValidatorMetadata(ClassMetadata $metadata)
         {
             $metadata->addPropertyConstraint('name', new Assert\NotBlank());
-            $metadata->addPropertyConstraint('name', new Asert\Length(array(
+            $metadata->addPropertyConstraint('name', new Assert\Length(array(
                 'min' => 5,
                 'max' => 20,
             )));
@@ -172,7 +172,7 @@ method of the Validator builder::
 
     $validator = Validation::createValidatorBuilder()
         // ... add loaders
-        ->setMetadataCache(new ApcCache('some_apc_prefix'));
+        ->setMetadataCache(new ApcCache('some_apc_prefix'))
         ->getValidator();
 
 Using a Custom MetadataFactory
@@ -193,7 +193,7 @@ this custom implementation using
     use Symfony\Component\Validator\Validation;
 
     $validator = Validation::createValidatorBuilder()
-        ->setMetadataFactory(new CustomMetadataFactory(...));
+        ->setMetadataFactory(new CustomMetadataFactory(...))
         ->getValidator();
 
 .. caution::

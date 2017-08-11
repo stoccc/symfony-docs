@@ -184,12 +184,12 @@ and ``redirect()`` methods::
     The ``redirectToRoute()`` method was introduced in Symfony 2.6. Previously (and still now), you
     could use ``redirect()`` and ``generateUrl()`` together for this.
 
-For more information, see the :doc:`Routing chapter </routing>`.
+For more information, see the :doc:`Routing article </routing>`.
 
 .. caution::
 
-    The ``redirect()`` method does not check its destination in any way. If you 
-    redirect to some URL provided by the end-users, your application may be open 
+    The ``redirect()`` method does not check its destination in any way. If you
+    redirect to some URL provided by the end-users, your application may be open
     to the `unvalidated redirects security vulnerability`_.
 
 
@@ -230,14 +230,14 @@ creating unnecessarily deep structures::
     ));
 
 The Symfony templating system and Twig are explained more in the
-:doc:`Creating and Using Templates chapter </templating>`.
+:doc:`Creating and Using Templates article </templating>`.
 
 .. index::
    single: Controller; Accessing services
 
 .. _controller-accessing-services:
 
-Accessing other Services
+Accessing Other Services
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Symfony comes packed with a lot of useful objects, called *services*. These
@@ -266,7 +266,7 @@ console command:
 .. versionadded:: 2.6
     Prior to Symfony 2.6, this command was called ``container:debug``.
 
-For more information, see the :doc:`/service_container` chapter.
+For more information, see the :doc:`/service_container` article.
 
 .. tip::
 
@@ -352,8 +352,8 @@ Managing the Session
 --------------------
 
 Symfony provides a nice session object that you can use to store information
-about the user between requests. By default, Symfony stores the attributes in a
-cookie by using native PHP sessions.
+about the user between requests. By default, Symfony stores the token in a
+cookie and writes the attributes to a file by using native PHP sessions.
 
 To retrieve the session, call
 :method:`Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller::getSession`
@@ -425,19 +425,41 @@ read any flash messages from the session:
     .. code-block:: html+twig
 
         {# app/Resources/views/base.html.twig #}
+
+        {# you can read and display just one flash message type... #}
         {% for flash_message in app.session.flashBag.get('notice') %}
             <div class="flash-notice">
                 {{ flash_message }}
             </div>
         {% endfor %}
 
+        {# ...or you can read and display every flash message available #}
+        {% for type, flash_messages in app.session.flashBag.all %}
+            {% for flash_message in flash_messages %}
+                <div class="flash-{{ type }}">
+                    {{ flash_message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+
     .. code-block:: html+php
 
         <!-- app/Resources/views/base.html.php -->
-        <?php foreach ($view['session']->getFlash('notice') as $message): ?>
+
+        // you can read and display just one flash message type...
+        <?php foreach ($view['session']->getFlashBag()->get('notice') as $message): ?>
             <div class="flash-notice">
-                <?php echo "<div class='flash-error'>$message</div>" ?>
+                <?php echo $message ?>
             </div>
+        <?php endforeach ?>
+
+        // ...or you can read and display every flash message available
+        <?php foreach ($view['session']->getFlashBag()->all() as $type => $flash_messages): ?>
+            <?php foreach ($flash_messages as $flash_message): ?>
+                <div class="flash-<?php echo $type ?>">
+                    <?php echo $message ?>
+                </div>
+            <?php endforeach ?>
         <?php endforeach ?>
 
 .. note::
@@ -548,7 +570,7 @@ A) Shortcut methods (like ``render()`` and ``redirectToRoute()``);
 B) Access to *all* of the useful objects (services) in the system via the
    :ref:`get() <controller-accessing-services>` method.
 
-In other chapters, you'll learn how to use specific services from inside your controller
+In other articles, you'll learn how to use specific services from inside your controller
 that will help you persist and fetch objects from a database, process form submissions,
 handle caching and more.
 

@@ -7,16 +7,32 @@ Symfony Twig Extensions
 =======================
 
 Twig is the default template engine for Symfony. By itself, it already contains
-a lot of built-in functions, filters, tags and tests (learn more about them
-from the `Twig Reference`_).
+a lot of built-in functions, filters, tags and tests. You can learn more about
+them from the `Twig Reference`_.
 
-Symfony adds custom extensions on top of Twig to integrate some components
-into the Twig templates. The following sections describe the custom
-:ref:`functions <reference-twig-functions>`, :ref:`filters <reference-twig-filters>`,
-:ref:`tags <reference-twig-tags>` and :ref:`tests <reference-twig-tests>`
-that are available when using the Symfony Core Framework.
+The Symfony framework adds quite a few extra :ref:`functions <reference-twig-functions>`,
+:ref:`filters <reference-twig-filters>`, :ref:`tags <reference-twig-tags>`
+and :ref:`tests <reference-twig-tests>` to seamlessly integrate the
+various Symfony components with Twig templates. The following sections
+describe these extra features.
 
-There may also be tags in bundles you use that aren't listed here.
+.. tip::
+
+    Technically, most of the extensions live in the `Twig Bridge`_. That code
+    might give you some ideas when you need to write your own Twig extension
+    as described in :doc:`/templating/twig_extension`.
+
+.. note::
+
+    This reference only covers the Twig extensions provided by the Symfony
+    framework. You are probably using some other bundles as well, and
+    those might come with their own extensions not covered here.
+
+.. tip::
+
+    The `Twig Extensions repository`_ contains some additional Twig extensions
+    that do not belong to the Twig core, so you might want to have a look at
+    the `Twig Extensions documentation`_.
 
 .. _reference-twig-functions:
 
@@ -114,12 +130,12 @@ set for the package and the URL path. More information in
 :ref:`templating-assets`. For asset versioning, see
 :ref:`reference-framework-assets-version`.
 
-assets_version
+asset_version
 ~~~~~~~~~~~~~~
 
 .. code-block:: twig
 
-    {{ assets_version(packageName = null) }}
+    {{ asset_version(packageName = null) }}
 
 ``packageName`` *(optional)*
     **type**: ``string`` | ``null`` **default**: ``null``
@@ -579,14 +595,14 @@ file_excerpt
 
 .. code-block:: twig
 
-    {{ file|file_excerpt(line = null) }}
+    {{ file|file_excerpt(line) }}
 
 ``file``
     **type**: ``string``
-``line`` *(optional)*
+``line``
     **type**: ``integer``
 
-Generates an excerpt of seven lines around the given ``line``.
+Generates an excerpt of a code file around the given ``line`` number.
 
 format_file
 ~~~~~~~~~~~
@@ -623,12 +639,14 @@ file_link
 
 .. code-block:: twig
 
-    {{ file|file_link(line = null) }}
+    {{ file|file_link(line) }}
 
-``line`` *(optional)*
+``file``
+    **type**: ``string``
+``line``
     **type**: ``integer``
 
-Generates a link to the provided file (and optionally line number) using
+Generates a link to the provided file and line number using
 a preconfigured scheme.
 
 .. _reference-twig-tags:
@@ -743,12 +761,12 @@ needed objects and values. It is an instance of
 
 The available attributes are:
 
-* ``app.user``
-* ``app.request``
-* ``app.session``
-* ``app.environment``
-* ``app.debug``
-* ``app.security`` (deprecated as of 2.6)
+* ``app.user``, a PHP object representing the current user;
+* ``app.request``, a :class:``Symfony\\Component\\HttpFoundation\\Request`` object;
+* ``app.session``, a :class:``Symfony\\Component\\HttpFoundation\\Session\\Session`` object;
+* ``app.environment``, a string with the name of the execution environment;
+* ``app.debug``, a boolean telling whether the debug mode is enabled in the app;
+* ``app.security`` (deprecated as of 2.6).
 
 .. caution::
 
@@ -761,12 +779,11 @@ Symfony Standard Edition Extensions
 The Symfony Standard Edition adds some bundles to the Symfony Core Framework.
 Those bundles can have other Twig extensions:
 
-* **Twig Extensions** includes some interesting extensions that do not belong
-  to the Twig core. You can read more in `the official Twig Extensions
-  documentation`_;
 * **Assetic** adds the ``{% stylesheets %}``, ``{% javascripts %}`` and
   ``{% image %}`` tags. You can read more about them in
   :doc:`the Assetic Documentation </assetic/asset_management>`.
 
 .. _`Twig Reference`: http://twig.sensiolabs.org/documentation#reference
-.. _`the official Twig Extensions documentation`: http://twig.sensiolabs.org/doc/extensions/index.html
+.. _`Twig Extensions repository`: https://github.com/twigphp/Twig-extensions
+.. _`Twig Extensions documentation`: http://twig-extensions.readthedocs.io/en/latest/
+.. _`Twig Bridge`: https://github.com/symfony/symfony/tree/master/src/Symfony/Bridge/Twig/Extension

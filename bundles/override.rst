@@ -7,6 +7,14 @@ How to Override any Part of a Bundle
 This document is a quick reference for how to override different parts of
 third-party bundles.
 
+.. tip::
+
+    The bundle overriding mechanism means that you cannot use physical paths to
+    refer to bundle's resources (e.g. ``__DIR__/config/services.xml``). Always
+    use logical paths in your bundles (e.g. ``@AppBundle/Resources/config/services.xml``)
+    and call the :ref:`locateResource() method <http-kernel-resource-locator>`
+    to turn them into physical paths when needed.
+
 Templates
 ---------
 
@@ -39,7 +47,7 @@ Services & Configuration
 
 If you want to modify service definitions of another bundle, you can use a compiler
 pass to change the class of the service or to modify method calls. In the following
-example, the implementing class for the ``original-service-id`` is changed to 
+example, the implementing class for the ``original-service-id`` is changed to
 ``Acme\DemoBundle\YourService``::
 
     // src/Acme/DemoBundle/DependencyInjection/Compiler/OverrideServiceCompilerPass.php
@@ -72,17 +80,8 @@ associations. Learn more about this feature and its limitations in
 Forms
 -----
 
-In order to override a form type, it has to be registered as a service (meaning
-it is tagged as ``form.type``). You can then override it as you would override any
-service as explained in `Services & Configuration`_. This, of course, will only
-work if the type is referred to by its alias rather than being instantiated,
-e.g.::
-
-    $builder->add('name', 'custom_type');
-
-rather than::
-
-    $builder->add('name', new CustomType());
+Existing form types can be modified defining
+:doc:`form type extensions </form/create_form_type_extension>`.
 
 .. _override-validation:
 
@@ -93,7 +92,7 @@ Symfony loads all validation configuration files from every bundle and
 combines them into one validation metadata tree. This means you are able to
 add new constraints to a property, but you cannot override them.
 
-To override this, the 3rd party bundle needs to have configuration for
+To overcome this, the 3rd party bundle needs to have configuration for
 :doc:`validation groups </validation/groups>`. For instance, the FOSUserBundle
 has this configuration. To create your own validation, add the constraints
 to a new validation group:
@@ -155,14 +154,11 @@ can override the translations from any translation file, as long as it is in
 
 .. caution::
 
-    The last translation file always wins. That means that you need to make
-    sure that the bundle containing *your* translations is loaded after any
+    Translation files are not aware of :doc:`bundle inheritance </bundles/inheritance>`.
+    If you want to override translations from the parent bundle or another bundle,
+    make sure that the bundle containing *your* translations is loaded after any
     bundle whose translations you're overriding. This is done in ``AppKernel``.
 
-    Translation files are also not aware of :doc:`bundle inheritance </bundles/inheritance>`.
-    If you want to override translations from the parent bundle, be sure that the
-    parent bundle is loaded before the child bundle in the ``AppKernel`` class.
-
-    The file that always wins is the one that is placed in
-    ``app/Resources/translations``, as those files are always loaded last.
+    Finally, translations located in ``app/Resources/translations`` will override
+    all the other translations since those files are always loaded last.
 .. _`the Doctrine documentation`: http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/inheritance-mapping.html#overrides

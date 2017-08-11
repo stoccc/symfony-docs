@@ -57,7 +57,7 @@ the user::
                 if ($currentHour < 14 || $currentHour > 16) {
                     throw new AuthenticationException(
                         'You can only log in between 2 and 4!',
-                        100
+                        412 // HTTP 412 Precondition Failed
                     );
                 }
 
@@ -173,15 +173,12 @@ Now, configure your ``TimeAuthenticator`` as a service:
 
         // app/config/config.php
         use AppBundle\Security\TimeAuthenticator;
-        use Symfony\Component\DependencyInjection\Definition;
         use Symfony\Component\DependencyInjection\Reference;
-        
+
         // ...
 
-        $container->setDefinition('time_authenticator', new Definition(
-            TimeAuthenticator::class,
-            array(new Reference('security.password_encoder'))
-        ));
+        $container->register('time_authenticator', TimeAuthenticator::class)
+            ->addArgument(new Reference('security.password_encoder'));
 
 Then, activate it in the ``firewalls`` section of the security configuration
 using the ``simple_form`` key:

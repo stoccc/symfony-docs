@@ -15,9 +15,9 @@ How to Create a custom Authentication Provider
     * To authenticate via OAuth using a third-party service such as Google, Facebook
       or Twitter, try using the `HWIOAuthBundle`_ community bundle.
 
-If you have read the chapter on :doc:`/security`, you understand the
+If you have read the article on :doc:`/security`, you understand the
 distinction Symfony makes between authentication and authorization in the
-implementation of security. This chapter discusses the core classes involved
+implementation of security. This article discusses the core classes involved
 in the authentication process, and how to implement a custom authentication
 provider. Because authentication and authorization are separate concepts,
 this extension will be user-provider agnostic, and will function with your
@@ -27,7 +27,7 @@ wherever else you choose to store them.
 Meet WSSE
 ---------
 
-The following chapter demonstrates how to create a custom authentication
+The following article demonstrates how to create a custom authentication
 provider for WSSE authentication. The security protocol for WSSE provides
 several security benefits:
 
@@ -48,7 +48,7 @@ password digest.
 .. note::
 
     WSSE also supports application key validation, which is useful for web
-    services, but is outside the scope of this chapter.
+    services, but is outside the scope of this article.
 
 The Token
 ---------
@@ -142,9 +142,9 @@ set an authenticated token in the token storage if successful.
             $token = new WsseUserToken();
             $token->setUser($matches[1]);
 
-            $token->digest   = $matches[2];
-            $token->nonce    = $matches[3];
-            $token->created  = $matches[4];
+            $token->digest  = $matches[2];
+            $token->nonce   = $matches[3];
+            $token->created = $matches[4];
 
             try {
                 $authToken = $this->authenticationManager->authenticate($token);
@@ -371,7 +371,7 @@ requires the following methods:
 ``addConfiguration()``
     Method which is used to define the configuration
     options underneath the configuration key in your security configuration.
-    Setting configuration options are explained later in this chapter.
+    Setting configuration options are explained later in this article.
 
 .. note::
 
@@ -452,22 +452,21 @@ to service ids that do not exist yet: ``wsse.security.authentication.provider`` 
         // app/config/services.php
         use AppBundle\Security\Authentication\Provider\WsseProvider;
         use AppBundle\Security\Firewall\WsseListener;
-        use Symfony\Component\DependencyInjection\Definition;
         use Symfony\Component\DependencyInjection\Reference;
 
-        $definition = new Definition(WsseProvider::class, array(
-            '', // User Provider
-            '%kernel.cache_dir%/security/nonces',
-        ));
-        $definition->setPublic(false);
-        $container->setDefinition('wsse.security.authentication.provider', $definition)
+        $container->register('wsse.security.authentication.provider', WsseProvider::class)
+            ->setArguments(array(
+                '', // User Provider
+                '%kernel.cache_dir%/security/nonces',
+            ))
+            ->setPublic(false);
 
-        $definition = new Definition(WsseListener::class, array(
-            new Reference('security.token_storage'),
-            new Reference('security.authentication.manager'),
-        ));
-        $definition->setPublic(false);
-        $container->setDefinition('wsse.security.authentication.listener', $definition);
+        $container->register('wsse.security.authentication.listener', WsseListener::class)
+            ->setArguments(array(
+                new Reference('security.token_storage'),
+                new Reference('security.authentication.manager'),
+            ))
+            ->setPublic(false);
 
 Now that your services are defined, tell your security context about your
 factory in your bundle class:

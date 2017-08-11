@@ -174,10 +174,12 @@ allows you to return a list of extensions to register::
 
     use AppBundle\Form\Type\TestedType;
     use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+    use Symfony\Component\Form\Form;
     use Symfony\Component\Form\Forms;
     use Symfony\Component\Form\FormBuilder;
     use Symfony\Component\Form\Test\TypeTestCase;
     use Symfony\Component\Validator\ConstraintViolationList;
+    use Symfony\Component\Validator\Mapping\ClassMetadata;
     use Symfony\Component\Validator\Validator\ValidatorInterface;
 
     class TestedTypeTest extends TypeTestCase
@@ -185,9 +187,14 @@ allows you to return a list of extensions to register::
         protected function getExtensions()
         {
             $validator = $this->createMock(ValidatorInterface::class);
+            // use getMock() on PHPUnit 5.3 or below
+            // $validator = $this->getMock(ValidatorInterface::class);
             $validator
                 ->method('validate')
                 ->will($this->returnValue(new ConstraintViolationList()));
+            $validator
+                ->method('getMetadataFor')
+                ->will($this->returnValue(new ClassMetadata(Form::class)));
 
             return array(
                 new ValidatorExtension($validator),

@@ -8,6 +8,7 @@ TwigBundle Configuration ("twig")
 
     .. code-block:: yaml
 
+        # app/config/config.yml
         twig:
             exception_controller:  twig.controller.exception:showAction
 
@@ -21,7 +22,7 @@ TwigBundle Configuration ("twig")
                 - bootstrap_3_horizontal_layout.html.twig
 
                 # Example:
-                - MyBundle::form.html.twig
+                - form.html.twig
 
             globals:
 
@@ -40,7 +41,7 @@ TwigBundle Configuration ("twig")
 
             # The following were added in Symfony 2.3.
             # See http://twig.sensiolabs.org/doc/recipes.html#using-the-template-name-to-set-the-default-escaping-strategy
-            autoescape_service:        ~ # Example: '@my_service'
+            autoescape_service:        ~ # Example: 'my_service'
             autoescape_service_method: ~ # use in combination with autoescape_service option
             base_template_class:       ~ # Example: Twig_Template
             cache:                     '%kernel.cache_dir%/twig'
@@ -52,13 +53,26 @@ TwigBundle Configuration ("twig")
             paths:
                 '%kernel.root_dir%/../vendor/acme/foo-bar/templates': foo_bar
 
+            # The following were added in Symfony 2.7.
+            date:
+                format: d.m.Y, H:i:s
+                interval_format: '%%d days'
+                timezone: Asia/Tokyo
+            number_format:
+                decimals: 2
+                decimal_point: ','
+                thousands_separator: '.'
+
     .. code-block:: xml
 
+        <!-- app/config/config.xml -->
+        <?xml version="1.0" charset="UTF-8" ?>
         <container xmlns="http://symfony.com/schema/dic/services"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:twig="http://symfony.com/schema/dic/twig"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
-                                http://symfony.com/schema/dic/twig http://symfony.com/schema/dic/twig/twig-1.0.xsd">
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/twig http://symfony.com/schema/dic/twig/twig-1.0.xsd">
 
             <twig:config
                 auto-reload="%kernel.debug%"
@@ -71,10 +85,13 @@ TwigBundle Configuration ("twig")
                 optimizations="true"
             >
                 <twig:form-theme>form_div_layout.html.twig</twig:form-theme> <!-- Default -->
-                <twig:form-theme>MyBundle::form.html.twig</twig:form-theme>
+                <twig:form-theme>form.html.twig</twig:form-theme>
 
                 <twig:global key="foo" id="bar" type="service" />
                 <twig:global key="pi">3.14</twig:global>
+                
+                <twig:date format="d.m.Y, H:i:s" interval-format="%d days" timezone="Asia/Tokyo" />
+                <twig:number-format decimals="2" decimal-point="," thousands-separator="." />
 
                 <twig:exception-controller>AcmeFooBundle:Exception:showException</twig:exception-controller>
                 <twig:path namespace="foo_bar">%kernel.root_dir%/../vendor/acme/foo-bar/templates</twig:path>
@@ -83,27 +100,38 @@ TwigBundle Configuration ("twig")
 
     .. code-block:: php
 
+        // app/config/config.php
         $container->loadFromExtension('twig', array(
             'form_themes' => array(
                 'form_div_layout.html.twig', // Default
-                'MyBundle::form.html.twig',
-             ),
-             'globals' => array(
-                 'foo' => '@bar',
-                 'pi'  => 3.14,
-             ),
-             'auto_reload'          => '%kernel.debug%',
-             'autoescape'           => 'name',
-             'base_template_class'  => 'Twig_Template',
-             'cache'                => '%kernel.cache_dir%/twig',
-             'charset'              => '%kernel.charset%',
-             'debug'                => '%kernel.debug%',
-             'strict_variables'     => false,
-             'exception_controller' => 'AcmeFooBundle:Exception:showException',
-             'optimizations'        => true,
-             'paths' => array(
-                 '%kernel.root_dir%/../vendor/acme/foo-bar/templates' => 'foo_bar',
-             ),
+                'form.html.twig',
+            ),
+            'globals' => array(
+                'foo' => '@bar',
+                'pi'  => 3.14,
+            ),
+            'auto_reload'          => '%kernel.debug%',
+            'autoescape'           => 'name',
+            'base_template_class'  => 'Twig_Template',
+            'cache'                => '%kernel.cache_dir%/twig',
+            'charset'              => '%kernel.charset%',
+            'debug'                => '%kernel.debug%',
+            'strict_variables'     => false,
+            'exception_controller' => 'AcmeFooBundle:Exception:showException',
+            'optimizations'        => true,
+            'paths' => array(
+                '%kernel.root_dir%/../vendor/acme/foo-bar/templates' => 'foo_bar',
+            ),
+            'date' => array(
+                'format' => 'd.m.Y, H:i:s',
+                'interval_format' => '%%d days',
+                'timezone' => 'Asia/Tokyo',
+            ),
+            'number_format' => array(
+                'decimals' => 2,
+                'decimal_point' => ',',
+                'thousands_separator' => '.',
+            ),
         ));
 
 .. caution::
@@ -203,6 +231,37 @@ charset
 The charset used by the template files. In the Symfony Standard edition this
 defaults to the ``UTF-8`` charset.
 
+date
+~~~~
+
+These options define the default values used by the ``date`` filter to format
+date and time values. They are useful to avoid passing the same arguments on
+every ``date`` filter call.
+
+format
+......
+
+**type**: ``string`` **default**: ``F j, Y H:i``
+
+The format used by the ``date`` filter to display values when no specific format
+is passed as argument.
+
+internal_format
+...............
+
+**type**: ``string`` **default**: ``%d days``
+
+The format used by the ``date`` filter to display ``DateInterval`` instances
+when no specific format is passed as argument.
+
+timezone
+........
+
+**type**: ``string`` **default**: (the value returned by ``date_default_timezone_get()``)
+
+The timezone used when formatting date values with the ``date`` filter and no
+specific timezone is passed as argument.
+
 debug
 ~~~~~
 
@@ -227,6 +286,38 @@ option is advanced. If you need to customize an error page you should use
 the previous link. If you need to perform some behavior on an exception,
 you should add a listener to the ``kernel.exception`` event (see :ref:`dic-tags-kernel-event-listener`).
 
+number_format
+~~~~~~~~~~~~~
+
+These options define the default values used by the ``number_format`` filter to
+format numeric values. They are useful to avoid passing the same arguments on
+every ``number_format`` filter call.
+
+decimals
+........
+
+**type**: ``integer`` **default**: ``0``
+
+The number of decimals used to format numeric values when no specific number is
+passed as argument to the ``number_format`` filter.
+
+decimal_point
+.............
+
+**type**: ``string`` **default**: ``.``
+
+The character used to separate the decimals from the integer part of numeric
+values when no specific character is passed as argument to the ``number_format``
+filter.
+
+thousands_separator
+...................
+
+**type**: ``string`` **default**: ``,``
+
+The character used to separate every group of thousands in numeric values when
+no specific character is passed as argument to the ``number_format`` filter.
+
 optimizations
 ~~~~~~~~~~~~~
 
@@ -242,6 +333,8 @@ By default, this option is ``-1``, which means that all optimizations are turned
 on. Set it to ``0`` to disable all the optimizations. You can even enable or
 disable these optimizations selectively, as explained in the Twig documentation
 about `the optimizer extension`_.
+
+.. _config-twig-paths:
 
 paths
 ~~~~~
@@ -272,8 +365,9 @@ The values of the ``paths`` option are defined as ``key: value`` pairs where the
         <container xmlns="http://symfony.com/schema/dic/services"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:twig="http://symfony.com/schema/dic/twig"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
-                                http://symfony.com/schema/dic/twig http://symfony.com/schema/dic/twig/twig-1.0.xsd">
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/twig http://symfony.com/schema/dic/twig/twig-1.0.xsd">
 
             <twig:config>
                 <!-- ... -->
@@ -315,8 +409,9 @@ for that directory:
         <container xmlns="http://symfony.com/schema/dic/services"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:twig="http://symfony.com/schema/dic/twig"
-            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
-                                http://symfony.com/schema/dic/twig http://symfony.com/schema/dic/twig/twig-1.0.xsd">
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd
+                http://symfony.com/schema/dic/twig http://symfony.com/schema/dic/twig/twig-1.0.xsd">
 
             <twig:config>
                 <!-- ... -->

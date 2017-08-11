@@ -67,7 +67,7 @@ a bare form class looks like::
 .. note::
 
     If this particular section of code isn't already familiar to you, you
-    probably need to take a step back and first review the :doc:`Forms chapter </forms>`
+    probably need to take a step back and first review the :doc:`Forms article </forms>`
     before proceeding.
 
 Assume for a moment that this form utilizes an imaginary "Product" class
@@ -307,7 +307,7 @@ and fill in the listener logic::
 
                     $formOptions = array(
                         'class'         => User::class,
-                        'property'      => 'fullName',
+                        'choice_label'  => 'fullName',
                         'query_builder' => function (EntityRepository $er) use ($user) {
                             // build a custom query
                             // return $er->createQueryBuilder('u')->addOrderBy('fullName', 'DESC');
@@ -390,12 +390,19 @@ it with :ref:`dic-tags-form-type`.
     .. code-block:: xml
 
         <!-- app/config/config.xml -->
-        <services>
-            <service id="app.form.friend_message" class="AppBundle\Form\Type\FriendMessageFormType">
-                <argument type="service" id="security.token_storage" />
-                <tag name="form.type" alias="app_friend_message" />
-            </service>
-        </services>
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+            <services>
+                <service id="app.form.friend_message" class="AppBundle\Form\Type\FriendMessageFormType">
+                    <argument type="service" id="security.token_storage" />
+                    <tag name="form.type" alias="app_friend_message" />
+                </service>
+            </services>
+        </container>
 
     .. code-block:: php
 
@@ -403,12 +410,9 @@ it with :ref:`dic-tags-form-type`.
         use AppBundle\Form\Type\FriendMessageFormType;
         use Symfony\Component\DependencyInjection\Reference;
 
-        $definition = new Definition(FriendMessageFormType::class, array(
-            new Reference('security.token_storage')
-        ));
-        $definition->addTag('form.type', array('alias' => 'app_friend_message'));
-
-        $container->setDefinition('app.form.friend_message', $definition);
+        $container->register('app.form.friend_message', FriendMessageFormType::class)
+            ->addArgument(new Reference('security.token_storage'))
+            ->addTag('form.type', array('alias' => 'app_friend_message'));
 
 If you wish to create it from within a service that has access to the form factory,
 you then use::
@@ -486,9 +490,10 @@ sport like this::
                     $positions = null === $sport ? array() : $sport->getAvailablePositions();
 
                     $form->add('position', 'entity', array(
-                        'class'       => 'AppBundle:Position',
+                        'class' => 'AppBundle:Position',
                         'placeholder' => '',
-                        'choices'     => $positions,
+                        'choices' => $positions,
+                        'choices_as_values' => true,
                     ));
                 }
             );
@@ -549,9 +554,10 @@ The type would now look like::
                 $positions = null === $sport ? array() : $sport->getAvailablePositions();
 
                 $form->add('position', 'entity', array(
-                    'class'       => 'AppBundle:Position',
+                    'class' => 'AppBundle:Position',
                     'placeholder' => '',
-                    'choices'     => $positions,
+                    'choices' => $positions,
+                    'choices_as_values' => true,
                 ));
             };
 
@@ -612,7 +618,7 @@ your application. Assume that you have a sport meetup creation controller::
             }
 
             return $this->render(
-                'AppBundle:Meetup:create.html.twig',
+                'meetup/create.html.twig',
                 array('form' => $form->createView())
             );
         }
@@ -627,7 +633,7 @@ field according to the current selection in the ``sport`` field:
 
     .. code-block:: html+twig
 
-        {# app/Resources/views/Meetup/create.html.twig #}
+        {# app/Resources/views/meetup/create.html.twig #}
         {{ form_start(form) }}
             {{ form_row(form.sport) }}    {# <select id="meetup_sport" ... #}
             {{ form_row(form.position) }} {# <select id="meetup_position" ... #}

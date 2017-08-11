@@ -348,9 +348,17 @@ The end user can provide values in any configuration file:
     .. code-block:: xml
 
         <!-- app/config/config.xml -->
-        <parameters>
-            <parameter key="acme_blog.author.email">fabien@example.com</parameter>
-        </parameters>
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <container xmlns="http://symfony.com/schema/dic/services"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://symfony.com/schema/dic/services
+                http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+            <parameters>
+                <parameter key="acme_blog.author.email">fabien@example.com</parameter>
+            </parameters>
+
+        </container>
 
     .. code-block:: php
 
@@ -462,6 +470,21 @@ API is being used. The following code, would work for *all* users::
             }
         }
     }
+
+Resources
+---------
+
+If the bundle references any resources (config files, translation files, etc.),
+don't use physical paths (e.g. ``__DIR__/config/services.xml``) but logical
+paths (e.g. ``@AppBundle/Resources/config/services.xml``).
+
+The logical paths are required because of the bundle overriding mechanism that
+lets you override any resource/file of any bundle. See :ref:`http-kernel-resource-locator`
+for more details about transforming physical paths into logical paths.
+
+Beware that templates use a simplified version of the logical path shown above.
+For example, an ``index.html.twig`` template located in the ``Resources/views/Default/``
+directory of the AppBundle, is referenced as ``@App/Default/index.html.twig``.
 
 Learn more
 ----------

@@ -22,19 +22,22 @@ executable that needs to be installed on your system only once:
     $ sudo chmod a+x /usr/local/bin/symfony
 
     # Windows systems
-    c:\> php -r "readfile('https://symfony.com/installer');" > symfony
+    c:\> php -r "file_put_contents('symfony', file_get_contents('https://symfony.com/installer'));"
 
 .. note::
 
     In Linux and macOS, a global ``symfony`` command is created. In Windows,
     move the ``symfony`` file to a directory that's included in the ``PATH``
-    environment variable to create the global command or move it to any other
-    directory convenient for you:
+    environment variable and create a ``symfony.bat`` file to create the global
+    command or move it to any other directory convenient for you:
 
     .. code-block:: terminal
 
         # for example, if WAMP is used ...
         c:\> move symfony c:\wamp\bin\php
+        # create symfony.bat in the same folder
+        c:\> cd c:\wamp\bin\php
+        c:\> (echo @ECHO OFF & echo php "%~dp0symfony" %*) > symfony.bat
         # ... then, execute the command as:
         c:\> symfony
 
@@ -61,6 +64,28 @@ to meet those requirements.
 
     If the installer doesn't work for you or doesn't output anything, make sure
     that the PHP `Phar extension`_ is installed and enabled on your computer.
+
+.. note::
+
+    If the SSL certificates are not properly installed in your system, you
+    may get this error:
+
+        cURL error 60: SSL certificate problem: unable to get local issuer certificate.
+
+    You can solve this issue as follows:
+
+    #. Download a file with the updated list of certificates from
+       https://curl.haxx.se/ca/cacert.pem
+    #. Move the downloaded ``cacert.pem`` file to some safe location in your system
+    #. Update your ``php.ini`` file and configure the path to that file:
+
+       .. code-block:: ini
+
+           ; Linux and macOS systems
+           curl.cainfo = "/path/to/cacert.pem"
+
+           ; Windows systems
+           curl.cainfo = "C:\path\to\cacert.pem"
 
 Basing your Project on a Specific Symfony Version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

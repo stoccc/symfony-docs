@@ -8,6 +8,33 @@ You can also match on the HTTP *host* of the incoming request.
 
 .. configuration-block::
 
+    .. code-block:: php-annotations
+
+        // src/Acme/DemoBundle/Controller/MainController.php
+        namespace Acme\DemoBundle\Controller;
+
+        use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+        use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+        class MainController extends Controller
+        {
+            /**
+             * @Route("/", name="mobile_homepage", host="m.example.com")
+             */
+            public function mobileHomepageAction()
+            {
+                // ...
+            }
+
+            /**
+             * @Route("/", name="homepage")
+             */
+            public function homepageAction()
+            {
+                // ...
+            }
+        }
+
     .. code-block:: yaml
 
         mobile_homepage:
@@ -63,12 +90,39 @@ you can use placeholders in your hostname:
 
 .. configuration-block::
 
+    .. code-block:: php-annotations
+
+        // src/Acme/DemoBundle/Controller/MainController.php
+        namespace Acme\DemoBundle\Controller;
+
+        use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+        use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+        class MainController extends Controller
+        {
+            /**
+             * @Route("/", name="projects_homepage", host="{project_name}.example.com")
+             */
+            public function projectsHomepageAction()
+            {
+                // ...
+            }
+
+            /**
+             * @Route("/", name="homepage")
+             */
+            public function homepageAction()
+            {
+                // ...
+            }
+        }
+
     .. code-block:: yaml
 
         projects_homepage:
             path:     /
             host:     "{project_name}.example.com"
-            defaults: { _controller: AcmeDemoBundle:Main:mobileHomepage }
+            defaults: { _controller: AcmeDemoBundle:Main:projectsHomepage }
 
         homepage:
             path:     /
@@ -83,7 +137,7 @@ you can use placeholders in your hostname:
                 http://symfony.com/schema/routing/routing-1.0.xsd">
 
             <route id="projects_homepage" path="/" host="{project_name}.example.com">
-                <default key="_controller">AcmeDemoBundle:Main:mobileHomepage</default>
+                <default key="_controller">AcmeDemoBundle:Main:projectsHomepage</default>
             </route>
 
             <route id="homepage" path="/">
@@ -98,7 +152,7 @@ you can use placeholders in your hostname:
 
         $collection = new RouteCollection();
         $collection->add('project_homepage', new Route('/', array(
-            '_controller' => 'AcmeDemoBundle:Main:mobileHomepage',
+            '_controller' => 'AcmeDemoBundle:Main:projectsHomepage',
         ), array(), array(), '{project_name}.example.com'));
 
         $collection->add('homepage', new Route('/', array(
@@ -112,6 +166,39 @@ instance, if you want to match both ``m.example.com`` and
 ``mobile.example.com``, you use this:
 
 .. configuration-block::
+
+    .. code-block:: php-annotations
+
+        // src/Acme/DemoBundle/Controller/MainController.php
+        namespace Acme\DemoBundle\Controller;
+
+        use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+        use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+        class MainController extends Controller
+        {
+            /**
+             * @Route(
+             *     "/",
+             *     name="mobile_homepage",
+             *     host="{subdomain}.example.com",
+             *     defaults={"subdomain"="m"},
+             *     requirements={"subdomain"="m|mobile"}
+             * )
+             */
+            public function mobileHomepageAction()
+            {
+                // ...
+            }
+
+            /**
+             * @Route("/", name="homepage")
+             */
+            public function homepageAction()
+            {
+                // ...
+            }
+        }
 
     .. code-block:: yaml
 
@@ -173,6 +260,39 @@ instance, if you want to match both ``m.example.com`` and
 
     .. configuration-block::
 
+        .. code-block:: php-annotations
+
+            // src/Acme/DemoBundle/Controller/MainController.php
+            namespace Acme\DemoBundle\Controller;
+
+            use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+            use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+            class MainController extends Controller
+            {
+                /**
+                 * @Route(
+                 *     "/",
+                 *     name="mobile_homepage",
+                 *     host="m.{domain}",
+                 *     defaults={"domain"="%domain%"},
+                 *     requirements={"domain"="%domain%"}
+                 * )
+                 */
+                public function mobileHomepageAction()
+                {
+                    // ...
+                }
+
+                /**
+                 * @Route("/", name="homepage")
+                 */
+                public function homepageAction()
+                {
+                    // ...
+                }
+            }
+
         .. code-block:: yaml
 
             mobile_homepage:
@@ -193,7 +313,8 @@ instance, if you want to match both ``m.example.com`` and
             <?xml version="1.0" encoding="UTF-8" ?>
             <routes xmlns="http://symfony.com/schema/routing"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+                xsi:schemaLocation="http://symfony.com/schema/routing
+                    http://symfony.com/schema/routing/routing-1.0.xsd">
 
                 <route id="mobile_homepage" path="/" host="m.{domain}">
                     <default key="_controller">AcmeDemoBundle:Main:mobileHomepage</default>
@@ -240,6 +361,22 @@ You can also set the host option on imported routes:
 
 .. configuration-block::
 
+    .. code-block:: php-annotations
+
+        // src/Acme/HelloBundle/Controller/MainController.php
+        namespace Acme\HelloBundle\Controller;
+
+        use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+        use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+        /**
+         * @Route(host="hello.example.com")
+         */
+        class MainController extends Controller
+        {
+            // ...
+        }
+
     .. code-block:: yaml
 
         acme_hello:
@@ -251,17 +388,16 @@ You can also set the host option on imported routes:
         <?xml version="1.0" encoding="UTF-8" ?>
         <routes xmlns="http://symfony.com/schema/routing"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+            xsi:schemaLocation="http://symfony.com/schema/routing
+                http://symfony.com/schema/routing/routing-1.0.xsd">
 
             <import resource="@AcmeHelloBundle/Resources/config/routing.xml" host="hello.example.com" />
         </routes>
 
     .. code-block:: php
 
-        use Symfony\Component\Routing\RouteCollection;
-
-        $collection = new RouteCollection();
-        $collection->addCollection($loader->import("@AcmeHelloBundle/Resources/config/routing.php"), '', array(), array(), array(), 'hello.example.com');
+        $collection = $loader->import("@AcmeHelloBundle/Resources/config/routing.php");
+        $collection->setHost('hello.example.com');
 
         return $collection;
 

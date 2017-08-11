@@ -22,7 +22,7 @@ answer.
 Consider the real-world example where you want to provide a plugin system
 for your project. A plugin should be able to add methods, or do something
 before or after a method is executed, without interfering with other plugins.
-This is not an easy problem to solve with single inheritance, and even if 
+This is not an easy problem to solve with single inheritance, and even if
 multiple inheritance was possible with PHP, it comes with its own drawbacks.
 
 The Symfony EventDispatcher component implements the `Mediator`_ pattern
@@ -135,7 +135,7 @@ A call to the dispatcher's ``addListener()`` method associates any valid
 PHP callable to an event::
 
     $listener = new AcmeListener();
-    $dispatcher->addListener('acme.action', array($listener, 'onFooAction'));
+    $dispatcher->addListener('acme.foo.action', array($listener, 'onFooAction'));
 
 The ``addListener()`` method takes up to three arguments:
 
@@ -161,12 +161,12 @@ The ``addListener()`` method takes up to three arguments:
 
         use Symfony\Component\EventDispatcher\Event;
 
-        $dispatcher->addListener('foo.action', function (Event $event) {
-            // will be executed when the foo.action event is dispatched
+        $dispatcher->addListener('acme.foo.action', function (Event $event) {
+            // will be executed when the acme.foo.action event is dispatched
         });
 
 Once a listener is registered with the dispatcher, it waits until the event
-is notified. In the above example, when the ``foo.action`` event is dispatched,
+is notified. In the above example, when the ``acme.foo.action`` event is dispatched,
 the dispatcher calls the ``AcmeListener::onFooAction()`` method and passes
 the ``Event`` object as the single argument::
 
@@ -182,7 +182,7 @@ the ``Event`` object as the single argument::
         }
     }
 
-The ``$event`` argument is the event class that was passed when dispatching the
+The ``$event`` argument is the event object that was passed when dispatching the
 event. In many cases, a special event subclass is passed with extra
 information. You can check the documentation or implementation of each event to
 determine which instance is passed.
@@ -198,7 +198,6 @@ determine which instance is passed.
     to tag services as event listeners::
 
         use Symfony\Component\DependencyInjection\ContainerBuilder;
-        use Symfony\Component\DependencyInjection\Definition;
         use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
         use Symfony\Component\DependencyInjection\Reference;
         use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
@@ -208,23 +207,19 @@ determine which instance is passed.
         $containerBuilder->addCompilerPass(new RegisterListenersPass());
 
         // register the event dispatcher service
-        $containerBuilder->setDefinition('event_dispatcher', new Definition(
-            ContainerAwareEventDispatcher::class,
-            array(new Reference('service_container'))
-        ));
+        $containerBuilder->register('event_dispatcher', ContainerAwareEventDispatcher::class)
+            ->addArgument(new Reference('service_container'));
 
         // register your event listener service
-        $listener = new Definition(\AcmeListener::class);
-        $listener->addTag('kernel.event_listener', array(
-            'event' => 'foo.action',
-            'method' => 'onFooAction',
-        ));
-        $containerBuilder->setDefinition('listener_service_id', $listener);
+        $containerBuilder->register('listener_service_id', \AcmeListener::class)
+            ->addTag('kernel.event_listener', array(
+                'event' => 'acme.foo.action',
+                'method' => 'onFooAction',
+            ));
 
         // register an event subscriber
-        $subscriber = new Definition(\AcmeSubscriber::class);
-        $subscriber->addTag('kernel.event_subscriber');
-        $containerBuilder->setDefinition('subscriber_service_id', $subscriber);
+        $containerBuilder->register('subscriber_service_id', \AcmeSubscriber::class)
+            ->addTag('kernel.event_subscriber');
 
     By default, the listeners pass assumes that the event dispatcher's service
     id is ``event_dispatcher``, that event listeners are tagged with the
@@ -441,7 +436,7 @@ EventDispatcher Aware Events and Listeners
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``EventDispatcher`` always passes the dispatched event, the event's
-name and a reference to itself to the listeners. This can lead to some advanced 
+name and a reference to itself to the listeners. This can lead to some advanced
 applications of the ``EventDispatcher`` including dispatching other events inside
 listeners, chaining events or even lazy loading listeners into the dispatcher object.
 

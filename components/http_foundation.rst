@@ -241,8 +241,8 @@ the
 method tells you if the request contains a session which was started in one of
 the previous requests.
 
-Accessing `Accept-*` Headers Data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Accessing ``Accept-*`` Headers Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can easily access basic data extracted from ``Accept-*`` headers
 by using the following methods:
@@ -292,6 +292,7 @@ represents an HTTP message. But when moving from a legacy system, adding
 methods or changing some default behavior might help. In that case, register a
 PHP callable that is able to create an instance of your ``Request`` class::
 
+    use AppBundle\Http\SpecialRequest;
     use Symfony\Component\HttpFoundation\Request;
 
     Request::setFactory(function (
@@ -467,8 +468,12 @@ represented by a PHP callable instead of a string::
     you must call ``ob_flush()`` before ``flush()``.
 
     Additionally, PHP isn't the only layer that can buffer output. Your web
-    server might also buffer based on its configuration. What's more, if you
-    use FastCGI, buffering can't be disabled at all.
+    server might also buffer based on its configuration. Some servers, such as
+    Nginx, let you disable buffering at config level or adding a special HTTP
+    header in the response::
+
+        // disables FastCGI buffering in Nginx only for this response
+        $response->headers->set('X-Accel-Buffering', 'no')
 
 .. _component-http-foundation-serving-files:
 
@@ -532,7 +537,7 @@ Please note that this will not work when the ``X-Sendfile`` header is set.
 
     If you *just* created the file during this same request, the file *may* be sent
     without any content. This may be due to cached file stats that return zero for
-    the size of the file. To fix this issue, call ``clearstatcache(false, $file)``
+    the size of the file. To fix this issue, call ``clearstatcache(true, $file)``
     with the path to the binary file.
 
 .. _component-http-foundation-json-response:
